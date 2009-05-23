@@ -1,0 +1,11 @@
+syntax: glob
+*.pyc
+*.pyo
+*.torrent
+.DS_Store
+syntax: regexp
+^build/*
+^dist/*
+^html/*
+.+\.egg-info/*
+^doc/out/*

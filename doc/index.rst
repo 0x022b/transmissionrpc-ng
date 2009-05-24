@@ -101,7 +101,7 @@ found in the Torrent object.
     'downloading'
     >>> torrent.eta
     datetime.timedelta(0, 750)
-    >>> for key, value in torrent.fields.iteritems():
+    >>> for key, value in torrent.fields.items():
     ...     print(key, value)
     ...
     ('comment', 'Ubuntu CD releases.ubuntu.com')

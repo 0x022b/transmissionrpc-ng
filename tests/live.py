@@ -26,13 +26,17 @@ class liveTestCase(unittest.TestCase):
         torrents = self.client.list()
         add_torrent = True
         self.torrent_id = None
-        for tid, torrent in torrents.iteritems():
+        for tid, torrent in torrents.items():
             if torrent.hashString == mf_torrent_hash:
                 self.torrent_id = tid
                 add_torrent = False
                 break
         if add_torrent:
-            self.torrent_id = self.client.add_url(mf_torrent_url).values()[0].id
+            torrents = self.client.add_url(mf_torrent_url)
+            for torrent in torrents.values():
+                if torrent.hashString == mf_torrent_hash:
+                    self.torrent_id = torrent.id
+
 
     def tearDown(self):
         self.client.remove(self.torrent_id, delete_data=True)
@@ -131,7 +135,7 @@ class liveTestCase(unittest.TestCase):
     def testGetSession(self):
         o = self.client.get_session()
         library_args = get_arguments('session-get', self.client.rpc_version)
-        for argument, value in o.fields.iteritems():
+        for argument, value in o.fields.items():
             argument = make_rpc_name(argument)
             self.assertTrue(argument in library_args
                 , msg='Response argument %s not found.' % (argument))
@@ -141,13 +145,13 @@ class liveTestCase(unittest.TestCase):
         self.assertEqual(len(library_args), 0)
 
     def getTorrent(self):
-        return self.client.info(self.torrent_id).values()[0]
+        return self.client.info(self.torrent_id)[self.torrent_id]
 
     def testGetTorrent(self):
         torrent = self.getTorrent()
         print('Probably RPC protocol version %d' % (self.client.rpc_version))
         library_args = get_arguments('torrent-get', self.client.rpc_version)
-        for argument, value in torrent.fields.iteritems():
+        for argument, value in torrent.fields.items():
             argument = make_rpc_name(argument)
             self.assertTrue(argument in library_args
                 , msg='Response argument %s not found.' % (argument))

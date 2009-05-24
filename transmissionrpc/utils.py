@@ -2,8 +2,8 @@
 # 2008-07, Erik Svensson <erik.public@gmail.com>
 
 import socket, datetime
-import constants
-from constants import logger
+import transmissionrpc.constants as constants
+from transmissionrpc.constants import logger
 
 UNITS = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
 
@@ -54,16 +54,16 @@ def inet_address(address, default_port, default_address='localhost'):
         port = default_port
     try:
         socket.getaddrinfo(addr, port, socket.AF_INET, socket.SOCK_STREAM)
-    except socket.gaierror, e:
+    except socket.gaierror as e:
         raise INetAddressError('Cannot look up address "%s".' % address)
     return (addr, port)
 
 def rpc_bool(arg):
-    if isinstance(arg, (str, unicode)):
+    if isinstance(arg, str):
         try:
             arg = bool(int(arg))
         except:
-            arg = arg.lower() in [u'true', u'yes']
+            arg = arg.lower() in ['true', 'yes']
     return 1 if bool(arg) else 0
 
 TR_TYPE_MAP = {
@@ -124,7 +124,7 @@ def get_arguments(method, rpc_version):
     else:
         return ValueError('Method "%s" not supported' % (method))
     accessible = []
-    for argument, info in args.iteritems():
+    for argument, info in args.items():
         valid_version = True
         if rpc_version < info[1]:
             valid_version = False

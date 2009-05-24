@@ -2,7 +2,7 @@
 # 2008-12, Erik Svensson <erik.public@gmail.com>
 
 import unittest
-import utils
+import transmissionrpc.utils
 
 def suite():
     suite = unittest.TestSuite()

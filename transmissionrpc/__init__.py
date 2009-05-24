@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # 2008-08, Erik Svensson <erik.public@gmail.com>
 
-from constants import *
-from transmission import TransmissionError, Torrent, Session, Client
+from transmissionrpc.constants import DEFAULT_PORT
+from transmissionrpc.transmission import TransmissionError, Torrent, Session, Client
 
-__author__    = u'Erik Svensson <erik.public@gmail.com>'
-__version__   = u'0.3'
-__copyright__ = u'Copyright (c) 2008 Erik Svensson'
-__license__   = u'MIT'
+__author__    = 'Erik Svensson <erik.public@gmail.com>'
+__version__   = '0.3'
+__copyright__ = 'Copyright (c) 2008-2009 Erik Svensson'
+__license__   = 'MIT'

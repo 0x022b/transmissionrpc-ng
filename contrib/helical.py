@@ -3,7 +3,7 @@
 # 2008-07, Erik Svensson <erik.public@gmail.com>
 
 import sys, os, os.path, re, itertools
-import urllib2, base64, shlex
+import urllib.request, base64, shlex
 from optparse import OptionParser
 try:
     import readline
@@ -14,16 +14,16 @@ import transmissionrpc
 from transmissionrpc.utils import *
 from transmissionrpc.constants import DEFAULT_PORT
 
-__author__    = u'Erik Svensson <erik.public@gmail.com>'
-__version__   = u'0.2'
-__copyright__ = u'Copyright (c) 2008 Erik Svensson'
-__license__   = u'MIT'
+__author__    = 'Erik Svensson <erik.public@gmail.com>'
+__version__   = '0.2'
+__copyright__ = 'Copyright (c) 2008 Erik Svensson'
+__license__   = 'MIT'
 
 class Helical(cmd.Cmd):
     def __init__(self):
         cmd.Cmd.__init__(self)
-        self.intro = u'Helical %s' % (__version__)
-        self.doc_leader = u'''
+        self.intro = 'Helical %s' % (__version__)
+        self.doc_leader = '''
 Helical is a command line interface that communicates with Transmission
 bittorent client through json-rpc. To run helical in interactive mode
 start without a command.
@@ -31,10 +31,10 @@ start without a command.
 
     def connect(self, address=None, port=None, username=None, password=None):
         self.tc = transmissionrpc.Client(address, port, username, password)
-        self.prompt = u'Helical %s:%d> ' % (address, port)
+        self.prompt = 'Helical %s:%d> ' % (address, port)
 
     def arg_tokenize(self, argstr):
-        return [unicode(token, 'utf-8') for token in shlex.split(argstr.encode('utf-8'))] or ['']
+        return [token for token in shlex.split(argstr)] or ['']
 
     def word_complete(self, text, words):
         suggestions = []
@@ -44,7 +44,7 @@ start without a command.
         return suggestions
 
     def _complete_torrent(self, name, offset):
-        words = [torrent.name for id, torrent in self.tc.torrents.iteritems()]
+        words = [torrent.name for id, torrent in self.tc.torrents.items()]
         suggestions = []
         cut_index = len(name) - offset
         for word in words:
@@ -58,8 +58,8 @@ start without a command.
         return self._complete_torrent(item, endidx - begidx)
 
     def help_quit(self):
-        print(u'quit|exit\n')
-        print(u'Exit to shell.\n')
+        print('quit|exit\n')
+        print('Exit to shell.\n')
 
     def do_quit(self, line):
         sys.exit('')
@@ -69,14 +69,14 @@ start without a command.
     do_EOF = do_quit
 
     def help_add(self):
-        print(u'add <torrent file or url> [<target dir> paused=(yes|no) peer-limit=#]\n')
-        print(u'Add a torrent to the transfer list.\n')
+        print('add <torrent file or url> [<target dir> paused=(yes|no) peer-limit=#]\n')
+        print('Add a torrent to the transfer list.\n')
 
     def do_add(self, line):
         args = self.arg_tokenize(line)
 
         if len(args) == 0:
-            print(u'Specify a torrent file or url')
+            print('Specify a torrent file or url')
             return
 
         torrent_url = args[0]
@@ -86,11 +86,11 @@ start without a command.
             torrent_file = open(torrent_url, 'r')
         else:
             try:
-                torrent_file = urllib2.urlopen(torrent_url)
+                torrent_file = urllib.request.urlopen(torrent_url)
             except:
                 torrent_file = None
         if not torrent_file:
-            print(u'Couldn\'t find torrent "%s"' % torrent_url)
+            print('Couldn\'t find torrent "%s"' % torrent_url)
             return
 
         add_args = {}
@@ -107,84 +107,84 @@ start without a command.
                             continue
                         except:
                             pass
-                    print(u'Unknown argument: "%s"' % arg)
+                    print('Unknown argument: "%s"' % arg)
 
         torrent_data = base64.b64encode(torrent_file.read())
         try:
             self.tc.add(torrent_data, **add_args)
-        except transmissionrpc.TransmissionError, e:
-            print(u'Failed to add torrent "%s"' % e)
+        except transmissionrpc.TransmissionError as e:
+            print('Failed to add torrent "%s"' % e)
 
     def complete_remove(self, text, line, begidx, endidx):
         return self._complete_torrent_command(text, line, begidx, endidx)
 
     def help_remove(self):
-        print(u'remove <torrent id> [,<torrent id>, ...]\n')
-        print(u'Remove one or more torrents from the transfer list.\n')
+        print('remove <torrent id> [,<torrent id>, ...]\n')
+        print('Remove one or more torrents from the transfer list.\n')
 
     def do_remove(self, line):
         args = self.arg_tokenize(line)
         if len(args) == 0:
-            raise ValueError(u'No torrent id')
+            raise ValueError('No torrent id')
         self.tc.remove(args)
 
     def complete_start(self, text, line, begidx, endidx):
         return self._complete_torrent_command(text, line, begidx, endidx)
 
     def help_start(self):
-        print(u'start <torrent id> [,<torrent id>, ...]\n')
-        print(u'Start one or more queued torrent transfers.\n')
+        print('start <torrent id> [,<torrent id>, ...]\n')
+        print('Start one or more queued torrent transfers.\n')
 
     def do_start(self, line):
         args = self.arg_tokenize(line)
         if len(args) == 0:
-            raise ValueError(u'No torrent id')
+            raise ValueError('No torrent id')
         self.tc.start(args)
 
     def complete_stop(self, text, line, begidx, endidx):
         return self._complete_torrent_command(text, line, begidx, endidx)
 
     def help_stop(self):
-        print(u'stop <torrent id> [,<torrent id>, ...]\n')
-        print(u'Stop one or more active torrent transfers.\n')
+        print('stop <torrent id> [,<torrent id>, ...]\n')
+        print('Stop one or more active torrent transfers.\n')
 
     def do_stop(self, line):
         args = self.arg_tokenize(line)
         if len(args) == 0:
-            raise ValueError(u'No torrent id')
+            raise ValueError('No torrent id')
         self.tc.stop(args)
 
     def complete_verify(self, text, line, begidx, endidx):
         return self._complete_torrent_command(text, line, begidx, endidx)
 
     def help_verify(self):
-        print(u'verify <torrent id> [,<torrent id>, ...]\n')
-        print(u'Verify one or more torrent transfers.\n')
+        print('verify <torrent id> [,<torrent id>, ...]\n')
+        print('Verify one or more torrent transfers.\n')
 
     def do_verify(self, line):
         args = self.arg_tokenize(line)
         if len(args) == 0:
-            raise ValueError(u'No torrent id')
+            raise ValueError('No torrent id')
         self.tc.verify(args)
 
     def complete_info(self, text, line, begidx, endidx):
         return self._complete_torrent_command(text, line, begidx, endidx)
 
     def help_info(self):
-        print(u'info [<torrent id>, ...]\n')
-        print(u'Get details for a torrent. If no torrent id is provided, all torrents are displayed.\n')
+        print('info [<torrent id>, ...]\n')
+        print('Get details for a torrent. If no torrent id is provided, all torrents are displayed.\n')
 
     def do_info(self, line):
         args = self.arg_tokenize(line)
         if len(args) == 0:
-            raise ValueError(u'No torrent id')
+            raise ValueError('No torrent id')
         result = self.tc.info(args)
-        for id, torrent in result.iteritems():
+        for id, torrent in result.items():
             print(self._torrent_detail(torrent))
 
     def help_list(self):
-        print(u'list\n')
-        print(u'List all torrent transfers.\n')
+        print('list\n')
+        print('List all torrent transfers.\n')
 
     def do_list(self, line):
         args = self.arg_tokenize(line)
@@ -192,15 +192,15 @@ start without a command.
         self._list_torrents(result)
 
     def help_files(self):
-        print(u'files [<torrent id>, ...]\n')
-        print(u'Get the file list for one or more torrents\n')
+        print('files [<torrent id>, ...]\n')
+        print('Get the file list for one or more torrents\n')
 
     def do_files(self, line):
         args = self.arg_tokenize(line)
         result = self.tc.get_files(args)
-        for tid, files in result.iteritems():
+        for tid, files in result.items():
             print('torrent id: %d' % tid)
-            for fid, file in files.iteritems():
+            for fid, file in files.items():
                 print('  %d: %s' % (fid, file['name']))
 
     def do_set(self, line):
@@ -212,30 +212,30 @@ start without a command.
         if len(args) > 0:
             for arg in args:
                 try:
-                    (k,v) = arg.split(u'=')
+                    (k,v) = arg.split('=')
                     set_args[str(k)] = str(v)
                     add_ids = False
                 except:
                     if add_ids:
                         ids.append(arg)
                     else:
-                        print(u'Unknown argument: "%s"' % arg)
+                        print('Unknown argument: "%s"' % arg)
         if len(ids) > 0:
             result = self.tc.change(ids, **set_args)
 
     def complete_session(self, text, line, begidx, endidx):
-        return self.word_complete(text, [u'get', u'set', u'stats'])
+        return self.word_complete(text, ['get', 'set', 'stats'])
 
     def help_session(self):
-        print(u'session (get|stats)\n')
-        print(u'Get session parameters or session statistics.\n')
+        print('session (get|stats)\n')
+        print('Get session parameters or session statistics.\n')
 
     def do_session(self, line):
         args = self.arg_tokenize(line)
-        if len(args[0]) == 0 or args[0] == u'get':
+        if len(args[0]) == 0 or args[0] == 'get':
             self.tc.get_session()
             print(self.tc.session)
-        elif args[0] == u'stats':
+        elif args[0] == 'stats':
             print(self.tc.session_stats())
 
     def do_request(self, line):
@@ -254,43 +254,43 @@ start without a command.
     def _list_torrents(self, torrents):
         if len(torrents) > 0:
             print(self._torrent_brief_header())
-            for tid, torrent in torrents.iteritems():
+            for tid, torrent in torrents.items():
                 print(self._torrent_brief(torrent))
 
     def _torrent_brief_header(self):
-        return u' Id  Done   ETA           Status       Download    Upload      Ratio  Name'
+        return ' Id  Done   ETA           Status       Download    Upload      Ratio  Name'
 
     def _torrent_brief(self, torrent):
-        s = u'% 3d: ' % (torrent.id)
+        s = '% 3d: ' % (torrent.id)
         try:
-            s += u'%5.1f%%' % torrent.progress
+            s += '%5.1f%%' % torrent.progress
         except:
             pass
         try:
             if torrent.fields['eta'] > 0:
-                s += u' %- 13s' % torrent.format_eta()
+                s += ' %- 13s' % torrent.format_eta()
             else:
-                s += u' -            '
+                s += ' -            '
         except:
             pass
         try:
-            s += u' %- 12s' % torrent.status
+            s += ' %- 12s' % torrent.status
         except:
-            s += u' -status     '
+            s += ' -status     '
             pass
         try:
-            s += u' %5.1f %- 5s' % format_speed(torrent.rateDownload)
-            s += u' %5.1f %- 5s' % format_speed(torrent.rateUpload)
+            s += ' %5.1f %- 5s' % format_speed(torrent.rateDownload)
+            s += ' %5.1f %- 5s' % format_speed(torrent.rateUpload)
         except:
-            s += u' -rate     '
-            s += u' -rate     '
+            s += ' -rate     '
+            s += ' -rate     '
             pass
         try:
-            s += u' %6.2f' % torrent.ratio
+            s += ' %6.2f' % torrent.ratio
         except:
-            s += u' -ratio'
+            s += ' -ratio'
             pass
-        s += u' ' + torrent.name
+        s += ' ' + torrent.name
         return s
 
     def _torrent_detail(self, torrent):
@@ -340,7 +340,7 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
     parser = OptionParser(usage='Usage: %prog [options] [[address]:[port]] [command]')
-    parser.add_option('-u', '--username', dest='username',
+    parser.add_option('-', '--username', dest='username',
                     help='Athentication username.')
     parser.add_option('-p', '--password', dest='password',
                     help='Athentication password.')
@@ -360,13 +360,13 @@ def main(args=None):
     helical = Helical()
     try:
         helical.connect(address, port, values.username, values.password)
-    except transmissionrpc.TransmissionError, error:
+    except transmissionrpc.TransmissionError as error:
         print(error)
         parser.print_help()
         return
 
     if command:
-        command_args = u' '.join([u'"%s"' % arg for arg in args[args.index(command)+1:]])
+        command_args = ' '.join(['"%s"' % arg for arg in args[args.index(command)+1:]])
         helical.onecmd(command + command_args)
     else:
         try:

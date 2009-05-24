@@ -3,15 +3,18 @@
 
 import sys, os, time, datetime
 import re
-import httplib, urllib2, base64, socket
+import base64, socket
+import http.client
+import urllib.request
+import urllib.error
 
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from constants import *
-from utils import *
+from transmissionrpc.constants import *
+from transmissionrpc.utils import *
 
 class TransmissionError(Exception):
     def __init__(self, message='', original=None):
@@ -54,7 +57,7 @@ class Torrent(object):
             fields = other.fields
         else:
             raise ValueError('Cannot update with supplied data')
-        for k, v in fields.iteritems():
+        for k, v in fields.items():
             self.fields[k.replace('-', '_')] = v
 
     def files(self):
@@ -63,7 +66,7 @@ class Torrent(object):
         """
         result = {}
         if 'files' in self.fields:
-            indicies = xrange(len(self.fields['files']))
+            indicies = range(len(self.fields['files']))
             files = self.fields['files']
             priorities = self.fields['priorities']
             wanted = self.fields['wanted']
@@ -82,7 +85,7 @@ class Torrent(object):
     def __getattr__(self, name):
         try:
             return self.fields[name]
-        except KeyError, e:
+        except KeyError as e:
             raise AttributeError('No attribute %s' % name)
 
     @property
@@ -170,18 +173,18 @@ class Session(object):
         else:
             raise ValueError('Cannot update with supplied data')
 
-        for k, v in fields.iteritems():
+        for k, v in fields.items():
             self.fields[k.replace('-', '_')] = v
 
     def __getattr__(self, name):
         try:
             return self.fields[name]
-        except KeyError, e:
+        except KeyError as e:
             raise AttributeError('No attribute %s' % name)
 
     def __str__(self):
         text = ''
-        for k, v in self.fields.iteritems():
+        for k, v in self.fields.items():
             text += "% 32s: %s\n" % (k[-32:], v)
         return text
 
@@ -194,13 +197,13 @@ class Client(object):
         base_url = 'http://' + address + ':' + str(port)
         self.url = base_url + '/transmission/rpc'
         if user and password:
-            password_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            password_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
             password_manager.add_password(realm=None, uri=self.url, user=user, passwd=password)
-            opener = urllib2.build_opener(
-                urllib2.HTTPBasicAuthHandler(password_manager)
-                , urllib2.HTTPDigestAuthHandler(password_manager)
+            opener = urllib.request.build_opener(
+                urllib.request.HTTPBasicAuthHandler(password_manager)
+                , urllib.request.HTTPDigestAuthHandler(password_manager)
                 )
-            urllib2.install_opener(opener)
+            urllib.request.install_opener(opener)
         elif user or password:
             logger.warning('Either user or password missing, not using authentication.')
         self._sequence = 0
@@ -228,7 +231,7 @@ class Client(object):
     def _debug_response(self, response, response_data):
         try:
             response_data = json.loads(response_data)
-        except:
+        except ValueError:
             pass
         logger.debug(
             json.dumps(
@@ -246,21 +249,20 @@ class Client(object):
         )
 
     def _http_query(self, query):
-        headers = {'X-Transmission-Session-Id': self.sessionid}
-        request = urllib2.Request(self.url, query, headers)
+        headers = {'X-Transmission-Session-Id': str(self.sessionid)}
+        request = urllib.request.Request(self.url, query, headers)
         request_count = 0
         while True:
-            error_data = ""
             try:
                 self._debug_request(request)
                 socket.setdefaulttimeout(10)
                 if (sys.version_info[0] == 2 and sys.version_info[1] > 5) or sys.version_info[0] > 2:
-                    response = urllib2.urlopen(request, timeout=60)
+                    response = urllib.request.urlopen(request, timeout=60)
                 else:
-                    response = urllib2.urlopen(request)
+                    response = urllib.request.urlopen(request)
                 break
-            except urllib2.HTTPError, error:
-                error_data = error.read()
+            except urllib.error.HTTPError as error:
+                error_data = error.read().decode('utf-8')
                 if error.code == 409:
                     logger.info('Server responded with 409, trying to set session-id.')
                     if request_count > 1:
@@ -270,23 +272,21 @@ class Client(object):
                         request.add_header('X-Transmission-Session-Id', self.sessionid)
                     else:
                         raise TransmissionError('Unknown conflict.', error)
-            except urllib2.URLError, error:
+                self._debug_response(error, error_data)
+            except urllib.error.URLError as error:
                 raise TransmissionError('Failed to connect to daemon.', error)
-            except httplib.BadStatusLine, error:
+            except http.client.BadStatusLine as error:
                 if (request_count > 1):
                     raise TransmissionError('Failed to request %s "%s".' % (self.url, query), error)
-            finally:
-                if error_data:
-                    self._debug_response(error, error_data)
             request_count = request_count + 1
-        result = response.read()
+        result = response.read().decode('utf-8')
         self._debug_response(response, result)
         return result
 
     def _request(self, method, arguments={}, ids=[], require_ids = False):
         """Send json-rpc request to Transmission using http POST"""
 
-        if not isinstance(method, (str, unicode)):
+        if not isinstance(method, str):
             raise ValueError('request takes method as string')
         if not isinstance(arguments, dict):
             raise ValueError('request takes arguments as dict')
@@ -307,7 +307,7 @@ class Client(object):
 
         try:
             data = json.loads(http_data)
-        except ValueError, e:
+        except ValueError as e:
             logger.error('Error: ' + str(e))
             logger.error('Request: \"%s\"' % (query))
             logger.error('HTTP data: \"%s\"' % (http_data))
@@ -347,10 +347,10 @@ class Client(object):
         """Take things and make them valid torrent identifiers"""
         ids = []
 
-        if isinstance(args, (int, long)):
+        if isinstance(args, int):
             ids.append(args)
-        elif isinstance(args, (str, unicode)):
-            for item in re.split(u'[ ,]+', args):
+        elif isinstance(args, str):
+            for item in re.split('[ ,]+', args):
                 if len(item) == 0:
                     continue
                 addition = None
@@ -368,7 +368,7 @@ class Client(object):
                         pass
                 if not addition:
                     # handle index ranges i.e. 5:10
-                    match = re.match(u'^(\d+):(\d+)$', item)
+                    match = re.match('^(\d+):(\d+)$', item)
                     if match:
                         try:
                             idx_from = int(match.group(1))
@@ -377,13 +377,13 @@ class Client(object):
                         except:
                             pass
                 if not addition:
-                    raise ValueError(u'Invalid torrent id, \"%s\"' % item)
+                    raise ValueError('Invalid torrent id, \"%s\"' % item)
                 ids.extend(addition)
         elif isinstance(args, (list)):
             for item in args:
                 ids.extend(self._format_ids(item))
         else:
-            raise ValueError(u'Invalid torrent id')
+            raise ValueError('Invalid torrent id')
         return ids
 
     def _update_session(self, data):
@@ -420,8 +420,10 @@ class Client(object):
             * `priority_low`,
             * `priority_normal`,
         """
+        if isinstance(data, bytes):
+            data = data.decode('ascii')
         args = {'metainfo': data}
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             argument = make_rpc_name(key)
             (arg, val) = argument_value_convert('torrent-add',
                                         argument, value, self.rpc_version)
@@ -449,7 +451,7 @@ class Client(object):
             torrent_file = open(torrent_url, 'r')
         else:
             try:
-                torrent_file = urllib2.urlopen(torrent_url)
+                torrent_file = urllib.request.urlopen(torrent_url)
             except:
                 torrent_file = None
 
@@ -500,7 +502,7 @@ class Client(object):
         fields = ['id', 'name', 'hashString', 'files', 'priorities', 'wanted']
         request_result = self._request('torrent-get', {'fields': fields}, ids)
         result = {}
-        for id, torrent in request_result.iteritems():
+        for id, torrent in request_result.items():
             result[id] = torrent.files()
         return result
 
@@ -511,7 +513,7 @@ class Client(object):
         """
         if not isinstance(items, dict):
             raise ValueError('Invalid file description')
-        for tid, files in items.iteritems():
+        for tid, files in items.items():
             if not isinstance(files, dict):
                 continue
             wanted = []
@@ -519,7 +521,7 @@ class Client(object):
             priority_high = []
             priority_normal = []
             priority_low = []
-            for fid, file in files.iteritems():
+            for fid, file in files.items():
                 if not isinstance(file, dict):
                     continue
                 if 'selected' in file and file['selected']:
@@ -551,7 +553,7 @@ class Client(object):
         Change torrent parameters. This is the list of parameters that.
         """
         args = {}
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             argument = make_rpc_name(key)
             (arg, val) = argument_value_convert('torrent-set'
                                     , argument, value, self.rpc_version)
@@ -570,7 +572,7 @@ class Client(object):
     def set_session(self, **kwargs):
         """Set session parameters"""
         args = {}
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if key == 'encryption' and value not in ['required', 'preferred', 'tolerated']:
                 raise ValueError('Invalid encryption value')
             argument = make_rpc_name(key)

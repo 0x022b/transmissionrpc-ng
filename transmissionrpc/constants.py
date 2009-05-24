@@ -7,7 +7,7 @@ logger = logging.getLogger('transmissionrpc')
 logger.setLevel(logging.ERROR)
 
 def mirror_dict(d):
-    d.update(dict((v, k) for k, v in d.iteritems()))
+    d.update(dict((v, k) for k, v in d.items()))
     return d
 
 DEFAULT_PORT = 9091

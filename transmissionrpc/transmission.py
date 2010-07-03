@@ -651,7 +651,7 @@ class Client(object):
         """list all torrents"""
         fields = ['id', 'hashString', 'name', 'sizeWhenDone', 'leftUntilDone'
             , 'eta', 'status', 'rateUpload', 'rateDownload', 'uploadedEver'
-            , 'downloadedEver', 'doneDate', 'isFinished']
+            , 'downloadedEver', 'doneDate', 'addedDate', 'isFinished']
         return self._request('torrent-get', {'fields': fields}, timeout=timeout)
 
     def change(self, ids, timeout=None, **kwargs):

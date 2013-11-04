@@ -219,6 +219,11 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(r.hashString, 'A001')
         self.assertEqual(r.name, 'testtransfer1')
 
+        r = tc.add_torrent('http://releases.ubuntu.com/13.10/ubuntu-13.10-desktop-i386.iso.torrent')
+        self.assertEqual(r.id, 2)
+        self.assertEqual(r.hashString, '597a92f6eeed29e6028b70b416c847e51ba76c38')
+        self.assertEqual(r.name, 'ubuntu-13.10-desktop-i386.iso')
+
     def testRemoveOld(self):
         tc = createClient(test_name='remove')
         

@@ -6,6 +6,7 @@ from transmissionrpc.utils import Field
 
 from six import iteritems, integer_types
 
+
 class Session(object):
     """
     Session is a class holding the session data for a Transmission daemon.
@@ -94,7 +95,8 @@ class Session(object):
         else:
             raise ValueError("Not a valid limit")
 
-    peer_port = property(_get_peer_port, _set_peer_port, None, "Peer port. This is a mutator.")
+    peer_port = property(_get_peer_port, _set_peer_port,
+                         None, "Peer port. This is a mutator.")
 
     def _get_pex_enabled(self):
         """Is peer exchange enabled?"""
@@ -108,4 +110,5 @@ class Session(object):
         else:
             raise TypeError("Not a valid type")
 
-    pex_enabled = property(_get_pex_enabled, _set_pex_enabled, None, "Enable peer exchange. This is a mutator.")
+    pex_enabled = property(_get_pex_enabled, _set_pex_enabled,
+                           None, "Enable peer exchange. This is a mutator.")

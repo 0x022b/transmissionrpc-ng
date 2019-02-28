@@ -270,7 +270,7 @@ class Torrent(object):
             self._fields['downloadLimited'] = Field(True, True)
             self._fields['downloadLimit'] = Field(limit, True)
             self._push()
-        elif limit == None:
+        elif limit is None:
             self._fields['downloadLimited'] = Field(False, True)
             self._push()
         else:
@@ -430,7 +430,7 @@ class Torrent(object):
             self._fields['uploadLimited'] = Field(True, True)
             self._fields['uploadLimit'] = Field(limit, True)
             self._push()
-        elif limit == None:
+        elif limit is None:
             self._fields['uploadLimited'] = Field(False, True)
             self._push()
         else:

@@ -88,7 +88,7 @@ def parse_torrent_ids(args):
         pass
     elif isinstance(args, str):
         for item in re.split('[ ,]+', args):
-            if len(item) == 0:
+            if not item:
                 continue
             addition = None
             torrent_id = parse_torrent_id(item)
@@ -258,7 +258,7 @@ class Client(object):
         if not isinstance(arguments, dict):
             raise ValueError('request takes arguments as dict')
         ids = parse_torrent_ids(ids)
-        if len(ids) > 0:
+        if ids:
             arguments['ids'] = ids
         elif require_ids:
             raise ValueError('request require ids')
@@ -410,9 +410,9 @@ class Client(object):
         if parsed_uri.scheme in ['file']:
             filepath = torrent
             # uri decoded different on linux / windows ?
-            if len(parsed_uri.path) > 0:
+            if parsed_uri.path:
                 filepath = parsed_uri.path
-            elif len(parsed_uri.netloc) > 0:
+            elif parsed_uri.netloc:
                 filepath = parsed_uri.netloc
             torrent_file = open(filepath, 'rb')
             torrent_data = torrent_file.read()
@@ -594,15 +594,15 @@ class Client(object):
             args = {
                 'timeout': timeout
             }
-            if len(high) > 0:
+            if high:
                 args['priority_high'] = high
-            if len(normal) > 0:
+            if normal:
                 args['priority_normal'] = normal
-            if len(low) > 0:
+            if low:
                 args['priority_low'] = low
-            if len(wanted) > 0:
+            if wanted:
                 args['files_wanted'] = wanted
-            if len(unwanted) > 0:
+            if unwanted:
                 args['files_unwanted'] = unwanted
             self.change_torrent([tid], **args)
 
@@ -651,7 +651,7 @@ class Client(object):
                 'torrent-set', argument, value, self.rpc_version)
             args[arg] = val
 
-        if len(args) > 0:
+        if args:
             self._request('torrent-set', args, ids, True, timeout=timeout)
         else:
             ValueError("No arguments to set")
@@ -678,7 +678,7 @@ class Client(object):
         if torrent_id is None:
             raise ValueError("Invalid id")
         dirname = os.path.dirname(name)
-        if len(dirname) > 0:
+        if dirname:
             raise ValueError("Target name cannot contain a path delimiter")
         args = {'path': location, 'name': name}
         result = self._request('torrent-rename-path',
@@ -782,7 +782,7 @@ class Client(object):
             (arg, val) = argument_value_convert(
                 'session-set', argument, value, self.rpc_version)
             args[arg] = val
-        if len(args) > 0:
+        if args:
             self._request('session-set', args, timeout=timeout)
 
     def blocklist_update(self, timeout=None):

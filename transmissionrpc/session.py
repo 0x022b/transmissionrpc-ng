@@ -62,7 +62,7 @@ class Session(object):
         for key in dirty:
             args[key] = self._fields[key].value
             self._fields[key] = self._fields[key]._replace(dirty=False)
-        if len(args) > 0:
+        if args:
             self._client.set_session(**args)
 
     def update(self, timeout=None):

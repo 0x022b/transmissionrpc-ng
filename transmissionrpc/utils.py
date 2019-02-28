@@ -79,10 +79,10 @@ def inet_address(address, default_port, default_address='localhost'):
             port = int(addr[1])
         except ValueError:
             raise INetAddressError('Invalid address "%s".' % address)
-        if len(addr[0]) == 0:
-            addr = default_address
-        else:
+        if addr[0]:
             addr = addr[0]
+        else:
+            addr = default_address
     else:
         raise INetAddressError('Invalid address "%s".' % address)
     try:

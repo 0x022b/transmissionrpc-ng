@@ -9,8 +9,6 @@ import datetime
 from transmissionrpc.constants import PRIORITY, RATIO_LIMIT, IDLE_LIMIT
 from transmissionrpc.utils import Field, format_timedelta
 
-from six import integer_types, string_types, text_type, iteritems
-
 
 def get_status_old(code):
     """Get the torrent status using old status codes"""
@@ -64,7 +62,7 @@ class Torrent(object):
         if 'name' in self._fields:
             name = self._fields['name'].value
         # if name is unicode, try to decode
-        if isinstance(name, text_type):
+        if isinstance(name, str):
             try:
                 name = name.encode(codec)
             except UnicodeError:
@@ -126,7 +124,7 @@ class Torrent(object):
         Update the torrent data from a Transmission JSON-RPC arguments dictionary
         """
         if isinstance(other, dict):
-            for key, value in iteritems(other):
+            for key, value in other.items():
                 self._fields[key.replace('-', '_')] = Field(value, False)
         elif isinstance(other, Torrent):
             for key in list(other._fields.keys()):
@@ -268,7 +266,7 @@ class Torrent(object):
         Get the download limit.
         Can be a number, 'session' or None.
         """
-        if isinstance(limit, integer_types):
+        if isinstance(limit, int):
             self._fields['downloadLimited'] = Field(True, True)
             self._fields['downloadLimit'] = Field(limit, True)
             self._push()
@@ -291,7 +289,7 @@ class Torrent(object):
         """
         Set the peer limit.
         """
-        if isinstance(limit, integer_types):
+        if isinstance(limit, int):
             self._fields['peer_limit'] = Field(limit, True)
             self._push()
         else:
@@ -312,7 +310,7 @@ class Torrent(object):
         Set the priority as string.
         Can be one of 'low', 'normal', 'high'.
         """
-        if isinstance(priority, string_types):
+        if isinstance(priority, str):
             self._fields['bandwidthPriority'] = Field(PRIORITY[priority], True)
             self._push()
 
@@ -329,7 +327,7 @@ class Torrent(object):
         """
         Set the seed idle limit in minutes.
         """
-        if isinstance(limit, integer_types):
+        if isinstance(limit, int):
             self._fields['seedIdleLimit'] = Field(limit, True)
             self._push()
         else:
@@ -376,7 +374,7 @@ class Torrent(object):
         """
         Set the seed ratio limit as float.
         """
-        if isinstance(limit, (integer_types, float)) and limit >= 0.0:
+        if isinstance(limit, (int, float)) and limit >= 0.0:
             self._fields['seedRatioLimit'] = Field(float(limit), True)
             self._push()
         else:
@@ -428,7 +426,7 @@ class Torrent(object):
         Set the upload limit.
         Can be a number, 'session' or None.
         """
-        if isinstance(limit, integer_types):
+        if isinstance(limit, int):
             self._fields['uploadLimited'] = Field(True, True)
             self._fields['uploadLimit'] = Field(limit, True)
             self._push()
@@ -451,7 +449,7 @@ class Torrent(object):
     def _set_queue_position(self, position):
         """Set the queue position for this torrent."""
         if self._rpc_version() >= 14:
-            if isinstance(position, integer_types):
+            if isinstance(position, int):
                 self._fields['queuePosition'] = Field(position, True)
                 self._push()
             else:

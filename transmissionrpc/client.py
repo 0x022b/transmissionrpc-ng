@@ -19,8 +19,6 @@ from transmissionrpc.httphandler import DefaultHTTPHandler
 from transmissionrpc.torrent import Torrent
 from transmissionrpc.session import Session
 
-from six import PY3, integer_types, string_types, iteritems
-
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -56,14 +54,14 @@ def debug_httperror(error):
 def parse_torrent_id(arg):
     """Parse an torrent id or torrent hashString."""
     torrent_id = None
-    if isinstance(arg, integer_types):
+    if isinstance(arg, int):
         # handle index
         torrent_id = int(arg)
     elif isinstance(arg, float):
         torrent_id = int(arg)
         if torrent_id != arg:
             torrent_id = None
-    elif isinstance(arg, string_types):
+    elif isinstance(arg, str):
         try:
             torrent_id = int(arg)
             if torrent_id >= 2**31:
@@ -88,7 +86,7 @@ def parse_torrent_ids(args):
 
     if args is None:
         pass
-    elif isinstance(args, string_types):
+    elif isinstance(args, str):
         for item in re.split('[ ,]+', args):
             if len(item) == 0:
                 continue
@@ -142,7 +140,7 @@ class Client(object):
     """
 
     def __init__(self, address='localhost', port=DEFAULT_PORT, user=None, password=None, http_handler=None, timeout=None):
-        if isinstance(timeout, (integer_types, float)):
+        if isinstance(timeout, (int, float)):
             self._query_timeout = float(timeout)
         else:
             self._query_timeout = DEFAULT_TIMEOUT
@@ -253,7 +251,7 @@ class Client(object):
         """
         Send json-rpc request to Transmission using http POST
         """
-        if not isinstance(method, string_types):
+        if not isinstance(method, str):
             raise ValueError('request takes method as string')
         if arguments is None:
             arguments = {}
@@ -425,11 +423,7 @@ class Client(object):
             else:
                 might_be_base64 = False
                 try:
-                    # check if this is base64 data
-                    if PY3:
-                        base64.b64decode(torrent.encode('utf-8'))
-                    else:
-                        base64.b64decode(torrent)
+                    base64.b64decode(torrent.encode('utf-8'))
                     might_be_base64 = True
                 except Exception:
                     pass
@@ -440,7 +434,7 @@ class Client(object):
             args = {'metainfo': torrent_data}
         else:
             args = {'filename': torrent}
-        for key, value in iteritems(kwargs):
+        for key, value in kwargs.items():
             argument = make_rpc_name(key)
             (arg, val) = argument_value_convert(
                 'torrent-add', argument, value, self.rpc_version)
@@ -549,7 +543,7 @@ class Client(object):
         request_result = self._request(
             'torrent-get', {'fields': fields}, ids, timeout=timeout)
         result = {}
-        for tid, torrent in iteritems(request_result):
+        for tid, torrent in request_result.items():
             result[tid] = torrent.files()
         return result
 
@@ -575,7 +569,7 @@ class Client(object):
         """
         if not isinstance(items, dict):
             raise ValueError('Invalid file description')
-        for tid, files in iteritems(items):
+        for tid, files in items.items():
             if not isinstance(files, dict):
                 continue
             wanted = []
@@ -583,7 +577,7 @@ class Client(object):
             high = []
             normal = []
             low = []
-            for fid, file_desc in iteritems(files):
+            for fid, file_desc in files.items():
                 if not isinstance(file_desc, dict):
                     continue
                 if 'selected' in file_desc and file_desc['selected']:
@@ -651,7 +645,7 @@ class Client(object):
     	   transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
-        for key, value in iteritems(kwargs):
+        for key, value in kwargs.items():
             argument = make_rpc_name(key)
             (arg, val) = argument_value_convert(
                 'torrent-set', argument, value, self.rpc_version)
@@ -781,7 +775,7 @@ class Client(object):
     	   transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
-        for key, value in iteritems(kwargs):
+        for key, value in kwargs.items():
             if key == 'encryption' and value not in ['required', 'preferred', 'tolerated']:
                 raise ValueError('Invalid encryption value')
             argument = make_rpc_name(key)

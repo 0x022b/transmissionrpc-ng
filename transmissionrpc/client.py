@@ -20,12 +20,8 @@ from transmissionrpc.session import Session
 
 from six import PY3, integer_types, string_types, iteritems
 
-if PY3:
-    from urllib.parse import urlparse
-    from urllib.request import urlopen
-else:
-    from urlparse import urlparse
-    from urllib2 import urlopen
+from urllib.parse import urlparse
+from urllib.request import urlopen
 
 
 def debug_httperror(error):
@@ -612,7 +608,7 @@ class Client(object):
         if torrent_id in result:
             return result[torrent_id]
         else:
-            for torrent in result.values():
+            for torrent in list(result.values()):
                 if torrent.hashString == torrent_id:
                     return torrent
             raise KeyError("Torrent not found in result")

@@ -165,7 +165,7 @@ class Torrent(object):
         result = {}
         if 'files' in self._fields:
             files = self._fields['files'].value
-            indices = range(len(files))
+            indices = list(range(len(files)))
             priorities = self._fields['priorities'].value
             wanted = self._fields['wanted'].value
             for item in zip(indices, files, priorities, wanted):

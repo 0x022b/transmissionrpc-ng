@@ -124,7 +124,7 @@ class Torrent(object):
         Update the torrent data from a Transmission JSON-RPC arguments dictionary
         """
         if isinstance(other, dict):
-            for key, value in other.items():
+            for key, value in list(other.items()):
                 self._fields[key.replace('-', '_')] = Field(value, False)
         elif isinstance(other, Torrent):
             for key in list(other._fields.keys()):

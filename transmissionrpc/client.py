@@ -434,7 +434,7 @@ class Client(object):
             args = {'metainfo': torrent_data}
         else:
             args = {'filename': torrent}
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             argument = make_rpc_name(key)
             (arg, val) = argument_value_convert(
                 'torrent-add', argument, value, self.rpc_version)
@@ -543,7 +543,7 @@ class Client(object):
         request_result = self._request(
             'torrent-get', {'fields': fields}, ids, timeout=timeout)
         result = {}
-        for tid, torrent in request_result.items():
+        for tid, torrent in list(request_result.items()):
             result[tid] = torrent.files()
         return result
 
@@ -569,7 +569,7 @@ class Client(object):
         """
         if not isinstance(items, dict):
             raise ValueError('Invalid file description')
-        for tid, files in items.items():
+        for tid, files in list(items.items()):
             if not isinstance(files, dict):
                 continue
             wanted = []
@@ -577,7 +577,7 @@ class Client(object):
             high = []
             normal = []
             low = []
-            for fid, file_desc in files.items():
+            for fid, file_desc in list(files.items()):
                 if not isinstance(file_desc, dict):
                     continue
                 if 'selected' in file_desc and file_desc['selected']:
@@ -645,7 +645,7 @@ class Client(object):
     	   transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             argument = make_rpc_name(key)
             (arg, val) = argument_value_convert(
                 'torrent-set', argument, value, self.rpc_version)
@@ -775,7 +775,7 @@ class Client(object):
     	   transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
-        for key, value in kwargs.items():
+        for key, value in list(kwargs.items()):
             if key == 'encryption' and value not in ['required', 'preferred', 'tolerated']:
                 raise ValueError('Invalid encryption value')
             argument = make_rpc_name(key)

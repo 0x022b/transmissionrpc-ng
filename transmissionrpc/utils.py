@@ -178,7 +178,7 @@ def get_arguments(method, rpc_version):
     else:
         return ValueError('Method "%s" not supported' % (method))
     accessible = []
-    for argument, info in args.items():
+    for argument, info in list(args.items()):
         valid_version = True
         if rpc_version < info[1]:
             valid_version = False

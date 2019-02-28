@@ -12,7 +12,7 @@ def mirror_dict(source):
     """
     Creates a dictionary with all values as keys and all keys as values.
     """
-    source.update(dict((value, key) for key, value in source.items()))
+    source.update(dict((value, key) for key, value in list(source.items())))
     return source
 
 

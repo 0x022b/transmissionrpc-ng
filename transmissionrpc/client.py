@@ -12,15 +12,15 @@ import os
 import base64
 import json
 
+from urllib.parse import urlparse
+from urllib.request import urlopen
+
 from transmissionrpc.constants import DEFAULT_PORT, DEFAULT_TIMEOUT
 from transmissionrpc.error import TransmissionError, HTTPHandlerError
 from transmissionrpc.utils import LOGGER, get_arguments, make_rpc_name, argument_value_convert, rpc_bool, is_logger_configured
 from transmissionrpc.httphandler import DefaultHTTPHandler
 from transmissionrpc.torrent import Torrent
 from transmissionrpc.session import Session
-
-from urllib.parse import urlparse
-from urllib.request import urlopen
 
 
 def debug_httperror(error):

@@ -5,11 +5,11 @@
 
 import sys
 
-from transmissionrpc.error import HTTPHandlerError
-
 from urllib.request import Request, build_opener, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
 from urllib.error import HTTPError, URLError
 from http.client import BadStatusLine
+
+from transmissionrpc.error import HTTPHandlerError
 
 
 class HTTPHandler(object):

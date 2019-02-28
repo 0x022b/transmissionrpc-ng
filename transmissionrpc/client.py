@@ -134,7 +134,7 @@ when using Python 2.6 or later and the default timeout is 30 seconds.
 """
 
 
-class Client(object):
+class Client:
     """
     Client is the class handling the Transmission JSON-RPC client protocol.
     """

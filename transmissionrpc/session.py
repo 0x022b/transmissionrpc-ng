@@ -5,7 +5,7 @@
 from transmissionrpc.utils import Field
 
 
-class Session(object):
+class Session:
     """
     Session is a class holding the session data for a Transmission daemon.
 

@@ -18,7 +18,7 @@ class torrent(unittest.TestCase):
             self.fail()
     
     def testConstruction(self):
-        self.failUnlessRaises(ValueError, transmissionrpc.Torrent, None, {})
+        self.assertRaises(ValueError, transmissionrpc.Torrent, None, {})
         torrent = transmissionrpc.Torrent(None, {'id': 42})
     
     def testAttributes(self):
@@ -34,7 +34,7 @@ class torrent(unittest.TestCase):
         self.assertPropertyException(KeyError, torrent, 'date_started')
         self.assertPropertyException(KeyError, torrent, 'date_done')
         
-        self.failUnlessRaises(KeyError, torrent.format_eta)
+        self.assertRaises(KeyError, torrent.format_eta)
         self.assertEqual(torrent.files(), {})
         
         data = {
@@ -68,6 +68,24 @@ class torrent(unittest.TestCase):
 
         torrent = transmissionrpc.Torrent(None, {'id': 42, 'eta': -1})
         self.assertPropertyException(ValueError, torrent, 'eta')
+
+        data = {
+            'id': 1,
+            'status': 4,
+            'sizeWhenDone': 1000,
+            'leftUntilDone': 500,
+            'uploadedEver': 1000,
+            'downloadedEver': 2000,
+            'uploadRatio': 0.5,
+            'eta': 3600,
+            'activityDate': time.mktime((2008,12,11,11,15,30,0,0,-1)),
+            'addedDate': time.mktime((2008,12,11,8,5,10,0,0,-1)),
+            'startDate': time.mktime((2008,12,11,9,10,5,0,0,-1)),
+            'doneDate': 0,
+        }
+
+        torrent = transmissionrpc.Torrent(None, data)
+        self.assertEqual(torrent.date_done, None)
 
     def testUnicode(self):
         torrent = transmissionrpc.Torrent(None, {'id': 42, 'name': 'あみ'})

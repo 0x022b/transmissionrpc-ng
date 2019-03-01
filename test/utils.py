@@ -75,7 +75,7 @@ class utils(unittest.TestCase):
         for args, expected in iteritems(table):
             self.assertEqual(tu.inet_address(*args), expected)
         
-        self.failUnlessRaises(tu.INetAddressError, tu.inet_address, '256.256.256.256', 2000)
+        self.assertRaises(tu.INetAddressError, tu.inet_address, '256.256.256.256', 2000)
     
     def testRPCBool(self):
         table = {

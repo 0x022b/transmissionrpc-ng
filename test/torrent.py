@@ -18,7 +18,7 @@ class torrent(unittest.TestCase):
             self.fail()
     
     def testConstruction(self):
-        self.failUnlessRaises(ValueError, transmissionrpc.Torrent, None, {})
+        self.assertRaises(ValueError, transmissionrpc.Torrent, None, {})
         torrent = transmissionrpc.Torrent(None, {'id': 42})
     
     def testAttributes(self):
@@ -34,7 +34,7 @@ class torrent(unittest.TestCase):
         self.assertPropertyException(KeyError, torrent, 'date_started')
         self.assertPropertyException(KeyError, torrent, 'date_done')
         
-        self.failUnlessRaises(KeyError, torrent.format_eta)
+        self.assertRaises(KeyError, torrent.format_eta)
         self.assertEqual(torrent.files(), {})
         
         data = {

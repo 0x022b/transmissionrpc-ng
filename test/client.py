@@ -148,7 +148,7 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(tc.timeout, transmissionrpc.constants.DEFAULT_TIMEOUT)
         tc.timeout = '100.1'
         self.assertEqual(tc.timeout, 100.1)
-        self.failUnlessRaises(ValueError, tc._set_timeout, '10 years')
+        self.assertRaises(ValueError, tc._set_timeout, '10 years')
             
     def testAddTorrent(self):
         data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')

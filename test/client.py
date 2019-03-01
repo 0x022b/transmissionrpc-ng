@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 2008-12, Erik Svensson <erik.public@gmail.com>
+# Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
 import os
@@ -147,53 +148,8 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(tc.timeout, transmissionrpc.constants.DEFAULT_TIMEOUT)
         tc.timeout = '100.1'
         self.assertEqual(tc.timeout, 100.1)
-        self.failUnlessRaises(ValueError, tc._set_timeout, '10 years')
+        self.assertRaises(ValueError, tc._set_timeout, '10 years')
             
-    def testAddOld(self):
-        tc = createClient(test_name='add')
-        data = 'data'
-        
-        r = tc.add(data)[0]
-        self.assertEqual(r.id, 0)
-        self.assertEqual(r.hashString, 'A000')
-        self.assertEqual(r.name, 'testtransfer0')
-        
-        r = tc.add(data, paused=True)[1]
-        self.assertEqual(r.id, 1)
-        self.assertEqual(r.hashString, 'A001')
-        self.assertEqual(r.name, 'testtransfer1')
-        
-        r = tc.add(data, download_dir='/tmp')[2]
-        self.assertEqual(r.id, 2)
-        self.assertEqual(r.hashString, 'A002')
-        self.assertEqual(r.name, 'testtransfer2')
-        
-        r = tc.add(data, peer_limit=10)[3]
-        self.assertEqual(r.id, 3)
-        self.assertEqual(r.hashString, 'A003')
-        self.assertEqual(r.name, 'testtransfer3')
-        
-        r = tc.add(data, paused=True, download_dir='/tmp', peer_limit=10)[4]
-        self.assertEqual(r.id, 4)
-        self.assertEqual(r.hashString, 'A004')
-        self.assertEqual(r.name, 'testtransfer4')
-        
-        self.failUnlessRaises(ValueError, tc.add, data, peer_limit='apa')
-
-    def testAddUriOld(self):
-        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-        tc = createClient(test_name='adduri')
-
-        r = tc.add_uri('torrent.txt', paused=False, download_dir='/var/downloads', peer_limit=1)[0]
-        self.assertEqual(r.id, 0)
-        self.assertEqual(r.hashString, 'A000')
-        self.assertEqual(r.name, 'testtransfer0')
-
-        r = tc.add_uri('file://' + os.path.join(data_path, 'torrent.txt'), paused=True, download_dir='/tmp', peer_limit=200)[1]
-        self.assertEqual(r.id, 1)
-        self.assertEqual(r.hashString, 'A001')
-        self.assertEqual(r.name, 'testtransfer1')
-
     def testAddTorrent(self):
         data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
@@ -219,26 +175,12 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(r.hashString, 'A001')
         self.assertEqual(r.name, 'testtransfer1')
 
-    def testRemoveOld(self):
-        tc = createClient(test_name='remove')
-        
-        tc.remove(['b000', 2, 3])
-        tc.remove(1, delete_data=True)
-        tc.remove('b002', delete_data=False)
-
     def testRemoveTorrent(self):
         tc = createClient(test_name='remove')
         
         tc.remove_torrent(['b000', 2, 3])
         tc.remove_torrent(1, delete_data=True)
         tc.remove_torrent('b002', delete_data=False)
-
-    def testStartOld(self):
-        tc = createClient(test_name='start')
-        
-        tc.start(['abcdef', 20, 30])
-        tc.start(1)
-        tc.start('a0123456789')
 
     def testStartTorrent(self):
         tc = createClient(test_name='start')
@@ -247,26 +189,12 @@ class ClientTest(unittest.TestCase):
         tc.start_torrent(1)
         tc.start_torrent('a0123456789')
 
-    def testStopOld(self):
-        tc = createClient(test_name='stop')
-        
-        tc.stop(2)
-        tc.stop('bad')
-        tc.stop(['bad', 'ba5', '30', 20])
-
     def testStopTorrent(self):
         tc = createClient(test_name='stop')
         
-        tc.stop(2)
-        tc.stop('bad')
-        tc.stop(['bad', 'ba5', '30', 20])
-
-    def testVerifyOld(self):
-        tc = createClient(test_name='verify')
-        
-        tc.verify(10000)
-        tc.verify('d')
-        tc.verify(['a', 'b', 'c'])
+        tc.stop_torrent(2)
+        tc.stop_torrent('bad')
+        tc.stop_torrent(['bad', 'ba5', '30', 20])
 
     def testVerifyTorrent(self):
         tc = createClient(test_name='verify')
@@ -274,17 +202,6 @@ class ClientTest(unittest.TestCase):
         tc.verify_torrent(10000)
         tc.verify_torrent('d')
         tc.verify_torrent(['a', 'b', 'c'])
-
-    def testInfo(self):
-        tc = createClient(test_name='info')
-        
-        r = tc.info()
-        self.assertTrue(2 in r)
-        self.assertTrue(3 in r)
-        t = r[2]
-        self.assertEqual(t.id, 2)
-        self.assertEqual(t.name, 'ubuntu-10.04-server-amd64.iso')
-        self.assertEqual(t.hashString, 'ab8ea951c022d4745a9b06ab8020b952a52b71ca')
 
     def testGetTorrent(self):
         tc = createClient(test_name='get_torrent')

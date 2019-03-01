@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
+# Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
 from setuptools import setup
-
-required = ['six>=1.1.0']
 
 setup(
     name='transmissionrpc',
@@ -16,7 +15,6 @@ setup(
     url='http://bitbucket.org/blueluna/transmissionrpc',
     keywords='transmission bittorent torrent',
     packages=['transmissionrpc'],
-    install_requires = required,
     test_suite = "test",
     zip_safe=True,
     classifiers = [

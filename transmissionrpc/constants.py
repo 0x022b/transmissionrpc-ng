@@ -3,50 +3,54 @@
 # Licensed under the MIT license.
 
 import logging
-from six import iteritems
 
 LOGGER = logging.getLogger('transmissionrpc')
 LOGGER.setLevel(logging.ERROR)
+
 
 def mirror_dict(source):
     """
     Creates a dictionary with all values as keys and all keys as values.
     """
-    source.update(dict((value, key) for key, value in iteritems(source)))
+    source.update(dict((value, key) for key, value in list(source.items())))
     return source
+
 
 DEFAULT_PORT = 9091
 
 DEFAULT_TIMEOUT = 30.0
 
-TR_PRI_LOW    = -1
-TR_PRI_NORMAL =  0
-TR_PRI_HIGH   =  1
+TR_PRI_LOW = -1
+TR_PRI_NORMAL = 0
+TR_PRI_HIGH = 1
 
 PRIORITY = mirror_dict({
-    'low'    : TR_PRI_LOW,
-    'normal' : TR_PRI_NORMAL,
-    'high'   : TR_PRI_HIGH
+    'low': TR_PRI_LOW,
+    'normal': TR_PRI_NORMAL,
+    'high': TR_PRI_HIGH
 })
 
-TR_RATIOLIMIT_GLOBAL    = 0 # follow the global settings
-TR_RATIOLIMIT_SINGLE    = 1 # override the global settings, seeding until a certain ratio
-TR_RATIOLIMIT_UNLIMITED = 2 # override the global settings, seeding regardless of ratio
+TR_RATIOLIMIT_GLOBAL = 0  # follow the global settings
+TR_RATIOLIMIT_SINGLE = 1  # override the global settings, seeding until a certain ratio
+# override the global settings, seeding regardless of ratio
+TR_RATIOLIMIT_UNLIMITED = 2
 
 RATIO_LIMIT = mirror_dict({
-    'global'    : TR_RATIOLIMIT_GLOBAL,
-    'single'    : TR_RATIOLIMIT_SINGLE,
-    'unlimited' : TR_RATIOLIMIT_UNLIMITED
+    'global': TR_RATIOLIMIT_GLOBAL,
+    'single': TR_RATIOLIMIT_SINGLE,
+    'unlimited': TR_RATIOLIMIT_UNLIMITED
 })
 
-TR_IDLELIMIT_GLOBAL     = 0 # follow the global settings
-TR_IDLELIMIT_SINGLE     = 1 # override the global settings, seeding until a certain idle time
-TR_IDLELIMIT_UNLIMITED  = 2 # override the global settings, seeding regardless of activity
+TR_IDLELIMIT_GLOBAL = 0  # follow the global settings
+# override the global settings, seeding until a certain idle time
+TR_IDLELIMIT_SINGLE = 1
+# override the global settings, seeding regardless of activity
+TR_IDLELIMIT_UNLIMITED = 2
 
 IDLE_LIMIT = mirror_dict({
-    'global'    : TR_RATIOLIMIT_GLOBAL,
-    'single'    : TR_RATIOLIMIT_SINGLE,
-    'unlimited' : TR_RATIOLIMIT_UNLIMITED
+    'global': TR_RATIOLIMIT_GLOBAL,
+    'single': TR_RATIOLIMIT_SINGLE,
+    'unlimited': TR_RATIOLIMIT_UNLIMITED
 })
 
 # A note on argument maps
@@ -60,7 +64,7 @@ IDLE_LIMIT = mirror_dict({
 
 # Arguments for torrent methods
 TORRENT_ARGS = {
-    'get' : {
+    'get': {
         'activityDate':                 ('number', 1, None, None, None, 'Last time of upload or download activity.'),
         'addedDate':                    ('number', 1, None, None, None, 'The date when this torrent was first added.'),
         'announceResponse':             ('string', 1, 7, None, None, 'The announce message from the tracker.'),
@@ -81,7 +85,7 @@ TORRENT_ARGS = {
         'error':                        ('number', 1, None, None, None, 'Kind of error. 0 means OK, 1 means tracker warning, 2 means tracker error, 3 means local error.'),
         'errorString':                  ('number', 1, None, None, None, 'Error message.'),
         'eta':                          ('number', 1, None, None, None, 'Estimated number of seconds left when downloading or seeding. -1 means not available and -2 means unknown.'),
-        'etaIdle':                      ('number', 15, None, None, None, 'Estimated number of seconds left until the idle time limit is reached. -1 means not available and -2 means unknown.'),        
+        'etaIdle':                      ('number', 15, None, None, None, 'Estimated number of seconds left until the idle time limit is reached. -1 means not available and -2 means unknown.'),
         'files':                        ('array', 1, None, None, None, 'Array of file object containing key, bytesCompleted, length and name.'),
         'fileStats':                    ('array', 5, None, None, None, 'Aray of file statistics containing bytesCompleted, wanted and priority.'),
         'hashString':                   ('string', 1, None, None, None, 'Hashstring unique for the torrent even between sessions.'),

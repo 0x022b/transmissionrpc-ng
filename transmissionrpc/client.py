@@ -129,8 +129,7 @@ with both id and hashString.
 Timeouts
 
 Since most methods results in HTTP requests against Transmission, it is
-possible to provide a argument called ``timeout``. Timeout is only effective
-when using Python 2.6 or later and the default timeout is 30 seconds.
+possible to provide a argument called ``timeout``.
 """
 
 

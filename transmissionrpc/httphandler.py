@@ -61,10 +61,7 @@ class DefaultHTTPHandler(HTTPHandler):
     def request(self, url, query, headers, timeout):
         request = Request(url, query.encode('utf-8'), headers)
         try:
-            if (sys.version_info[0] == 2 and sys.version_info[1] > 5) or sys.version_info[0] > 2:
-                response = self.http_opener.open(request, timeout=timeout)
-            else:
-                response = self.http_opener.open(request)
+            response = self.http_opener.open(request, timeout=timeout)
         except HTTPError as error:
             if error.fp is None:
                 raise HTTPHandlerError(

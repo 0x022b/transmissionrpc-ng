@@ -3,8 +3,6 @@
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
-import sys
-
 from urllib.request import Request, build_opener, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
 from urllib.error import HTTPError, URLError
 from http.client import BadStatusLine

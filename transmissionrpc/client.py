@@ -7,7 +7,6 @@ import sys
 import re
 import time
 import operator
-import warnings
 import os
 import base64
 import json

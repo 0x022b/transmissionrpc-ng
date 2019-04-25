@@ -711,8 +711,9 @@ class Client:
         """
         Get session parameters. See the Session class for more information.
         """
-        self._request('session-get', timeout=timeout)
-        self._update_server_version()
+        if self.session is None:
+            self._request('session-get', timeout=timeout)
+            self._update_server_version()
         return self.session
 
     def set_session(self, timeout=None, **kwargs):

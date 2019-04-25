@@ -516,27 +516,27 @@ class Client:
 
     def get_files(self, ids=None, timeout=None):
         """
-    	Get list of files for provided torrent id(s). If ids is empty,
-    	information for all torrents are fetched. This function returns a dictionary
-    	for each requested torrent id holding the information about the files.
+        Get list of files for provided torrent id(s). If ids is empty,
+        information for all torrents are fetched. This function returns a dictionary
+        for each requested torrent id holding the information about the files.
 
-    	::
+        ::
 
-    		{
-    			<torrent id>: {
-    				<file id>: {
-    					'name': <file name>,
-    					'size': <file size in bytes>,
-    					'completed': <bytes completed>,
-    					'priority': <priority ('high'|'normal'|'low')>,
-    					'selected': <selected for download (True|False)>
-    				}
+            {
+                <torrent id>: {
+                    <file id>: {
+                        'name': <file name>,
+                        'size': <file size in bytes>,
+                        'completed': <bytes completed>,
+                        'priority': <priority ('high'|'normal'|'low')>,
+                        'selected': <selected for download (True|False)>
+                    }
 
-    				...
-    			}
+                    ...
+                }
 
-    			...
-    		}
+                ...
+            }
         """
         fields = ['id', 'name', 'hashString', 'files', 'priorities', 'wanted']
         request_result = self._request(
@@ -549,22 +549,22 @@ class Client:
     def set_files(self, items, timeout=None):
         """
         Set file properties. Takes a dictionary with similar contents as the result
-    	of `get_files`.
+        of `get_files`.
 
-    	::
+        ::
 
-    		{
-    			<torrent id>: {
-    				<file id>: {
-    					'priority': <priority ('high'|'normal'|'low')>,
-    					'selected': <selected for download (True|False)>
-    				}
+            {
+                <torrent id>: {
+                    <file id>: {
+                        'priority': <priority ('high'|'normal'|'low')>,
+                        'selected': <selected for download (True|False)>
+                    }
 
-    				...
-    			}
+                    ...
+                }
 
-    			...
-    		}
+                ...
+            }
         """
         if not isinstance(items, dict):
             raise ValueError('Invalid file description')
@@ -607,8 +607,8 @@ class Client:
 
     def change_torrent(self, ids, timeout=None, **kwargs):
         """
-    	Change torrent parameters for the torrent(s) with the supplied id's. The
-    	parameters are:
+        Change torrent parameters for the torrent(s) with the supplied id's. The
+        parameters are:
 
         ============================ ===== =============== =======================================================================================
         Argument                     RPC   Replaced by     Description
@@ -640,8 +640,8 @@ class Client:
         ``uploadLimited``            5 -                   Enable upload speed limiter.
         ============================ ===== =============== =======================================================================================
 
-    	.. NOTE::
-    	   transmissionrpc will try to automatically fix argument errors.
+        .. NOTE::
+           transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
         for key, value in list(kwargs.items()):
@@ -771,7 +771,7 @@ class Client:
         ================================ ===== ================= ==========================================================================================================================
 
         .. NOTE::
-    	   transmissionrpc will try to automatically fix argument errors.
+           transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
         for key, value in list(kwargs.items()):

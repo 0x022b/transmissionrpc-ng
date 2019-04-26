@@ -156,8 +156,8 @@ class ClientTest(unittest.TestCase):
 
         tc = createClient(test_name='add_torrent_base64')
         torrent_path = os.path.join(data_path, 'ubuntu-12.04.2-alternate-amd64.iso.torrent')
-        data = open(torrent_path, 'rb').read()
-        data_b64 = base64.b64encode(data).decode('utf-8')
+        with open(torrent_path, 'rb') as data:
+            data_b64 = base64.b64encode(data.read()).decode('utf-8')
         r = tc.add_torrent(data_b64)
         self.assertEqual(r.id, 0)
         self.assertEqual(r.hashString, 'a21c45469c565f3fb9595e4e9707e6e9d45abca6')

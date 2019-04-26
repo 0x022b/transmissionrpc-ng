@@ -3,9 +3,10 @@
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
-from urllib.request import Request, build_opener, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
-from urllib.error import HTTPError, URLError
-from http.client import BadStatusLine
+import pycurl
+import re
+from base64 import b64encode
+from io import BytesIO
 
 from transmissionrpc.error import HTTPHandlerError
 
@@ -47,36 +48,84 @@ class DefaultHTTPHandler(HTTPHandler):
 
     def __init__(self):
         HTTPHandler.__init__(self)
-        self.http_opener = build_opener()
+
+    def _response_encoding(self, headers):
+        encoding = None
+
+        # Figure out what encoding was sent with the response, if any.
+        # Check against lowercased header name.
+        if headers and 'content-type' in headers:
+            content_type = headers['content-type'].lower()
+            match = re.search(r'charset=(\S+)', content_type)
+            if match:
+                encoding = match.group(1)
+
+        if encoding is None:
+            # Default encoding for HTML is iso-8859-1.
+            # Other content types may have different default encoding,
+            # or in case of binary data, may have no encoding at all.
+            encoding = 'iso-8859-1'
+
+        return encoding
+
+    def _response_headers(self, buffer):
+        headers = {}
+
+        # HTTP standard specifies that headers are encoded in iso-8859-1.
+        for line in buffer.getvalue().decode('iso-8859-1').splitlines():
+            # Header lines include the first status line (HTTP/1.x ...).
+            # We are going to ignore all lines that don't have a colon in them.
+            # This will botch headers that are split on multiple lines...
+            if ':' not in line:
+                continue
+
+            # Break the header line into header name and value.
+            name, value = line.split(':', 1)
+
+            # Remove whitespace that may be present.
+            # Header lines include the trailing newline, and there may be
+            # whitespace around the colon.
+            name = name.strip()
+            value = value.strip()
+
+            # Header names are case insensitive.
+            # Lowercase name here.
+            name = name.lower()
+
+            # Now we can actually record the header name and value.
+            # Note: this only works when headers are not duplicated.
+            headers[name] = value
+
+        return headers
 
     def set_authentication(self, uri, login, password):
-        password_manager = HTTPPasswordMgrWithDefaultRealm()
-        password_manager.add_password(
-            realm=None, uri=uri, user=login, passwd=password)
-        self.http_opener = build_opener(HTTPBasicAuthHandler(
-            password_manager), HTTPDigestAuthHandler(password_manager))
+        self._authorization = b64encode(
+            bytearray('{}:{}'.format(login, password), 'utf-8')).decode('utf-8')
 
     def request(self, url, query, headers, timeout):
-        request = Request(url, query.encode('utf-8'), headers)
-        try:
-            response = self.http_opener.open(request, timeout=timeout)
-        except HTTPError as error:
-            if error.fp is None:
-                raise HTTPHandlerError(
-                    error.filename, error.code, error.msg, dict(error.hdrs))
-            else:
-                raise HTTPHandlerError(
-                    error.filename, error.code, error.msg, dict(error.hdrs), error.read())
-        except URLError as error:
-            # urllib2.URLError documentation is horrendous!
-            # Try to get the tuple arguments of URLError
-            if hasattr(error.reason, 'args') and isinstance(error.reason.args, tuple) and len(error.reason.args) == 2:
-                raise HTTPHandlerError(
-                    httpcode=error.reason.args[0], httpmsg=error.reason.args[1])
-            else:
-                raise HTTPHandlerError(
-                    httpmsg='urllib2.URLError: %s' % (error.reason))
-        except BadStatusLine as error:
+        request_headers = ['{}: {}'.format(k, v) for k, v in headers.items()]
+
+        if self._authorization:
+            request_headers += ['Authorization: Basic {}'.format(self._authorization)]
+
+        buf1, buf2 = BytesIO(), BytesIO()
+        c = pycurl.Curl()
+        c.setopt(pycurl.URL, url)
+        c.setopt(pycurl.TIMEOUT, int(timeout))
+        c.setopt(pycurl.POSTFIELDS, query)
+        c.setopt(pycurl.HTTPHEADER, request_headers)
+        c.setopt(pycurl.WRITEFUNCTION, buf1.write)
+        c.setopt(pycurl.HEADERFUNCTION, buf2.write)
+        c.perform()
+
+        response_code = c.getinfo(pycurl.RESPONSE_CODE)
+        c.close()
+        response_headers = self._response_headers(buf2)
+        encoding = self._response_encoding(response_headers)
+        response_body = buf1.getvalue().decode(encoding)
+
+        if response_code == 200:
+            return response_body
+        else:
             raise HTTPHandlerError(
-                httpmsg='httplib.BadStatusLine: %s' % (error.line))
-        return response.read().decode('utf-8')
+                url, response_code, None, response_headers, response_body)

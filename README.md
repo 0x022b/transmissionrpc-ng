@@ -11,6 +11,7 @@ transmissionrpc-ng is compatible with Transmission 1.31 - 2.94.
 
 transmissionrpc-ng requires:
 
+* pycurl >= 7.43
 * Python >= 3.6
 
 ### Install

@@ -119,7 +119,7 @@ def parse_torrent_ids(args):
     return ids
 
 
-class Client(object):
+class Client:
     """
     Client is the class handling the Transmission JSON-RPC client protocol.
     """

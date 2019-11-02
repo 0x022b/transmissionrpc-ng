@@ -132,7 +132,7 @@ possible to provide a argument called ``timeout``.
 """
 
 
-class Client:
+class Client(object):
     """
     Client is the class handling the Transmission JSON-RPC client protocol.
     """

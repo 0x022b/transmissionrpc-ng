@@ -119,20 +119,6 @@ def parse_torrent_ids(args):
     return ids
 
 
-"""
-Torrent ids
-
-Many functions in Client takes torrent id. A torrent id can either be id or
-hashString. When supplying multiple id's it is possible to use a list mixed
-with both id and hashString.
-
-Timeouts
-
-Since most methods results in HTTP requests against Transmission, it is
-possible to provide a argument called ``timeout``.
-"""
-
-
 class Client(object):
     """
     Client is the class handling the Transmission JSON-RPC client protocol.

@@ -2,6 +2,7 @@
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
+# pylint: disable=line-too-long
 
 import logging
 

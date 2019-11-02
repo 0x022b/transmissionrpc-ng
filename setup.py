@@ -27,5 +27,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Topic :: Communications :: File Sharing',
         'Topic :: Internet'
-    ]
+    ],
+    python_requires='>=3.6',
 )

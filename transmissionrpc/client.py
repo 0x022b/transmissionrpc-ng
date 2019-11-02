@@ -11,6 +11,7 @@ import operator
 import os
 import base64
 import json
+import gzip
 
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -390,7 +391,10 @@ class Client:
             # there has been some problem with T's built in torrent fetcher,
             # use a python one instead
             torrent_file = urlopen(torrent)
-            torrent_data = torrent_file.read()
+            if torrent_file.info().get('Content-Encoding') == 'gzip':
+                torrent_data = gzip.decompress(torrent_file.read())
+            else:
+                torrent_data = torrent_file.read()
             torrent_data = base64.b64encode(torrent_data).decode('utf-8')
         if parsed_uri.scheme in ['file']:
             filepath = torrent
@@ -399,8 +403,12 @@ class Client:
                 filepath = parsed_uri.path
             elif parsed_uri.netloc:
                 filepath = parsed_uri.netloc
-            with open(filepath, 'rb') as torrent_file:
-                torrent_data = torrent_file.read()
+            if filepath.endswith('.gz'):
+                with gzip.open(filepath, 'rb') as torrent_file:
+                    torrent_data = torrent_file.read()
+            else:
+                with open(filepath, 'rb') as torrent_file:
+                    torrent_data = torrent_file.read()
             torrent_data = base64.b64encode(torrent_data).decode('utf-8')
         if not torrent_data:
             if torrent.endswith('.torrent') or torrent.startswith('magnet:'):

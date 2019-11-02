@@ -139,7 +139,7 @@ class Client(object):
                     ':' + str(urlo.port) + urlo.path
             else:
                 self.url = urlo.scheme + '://' + urlo.hostname + urlo.path
-            LOGGER.info('Using custom URL "' + self.url + '".')
+            LOGGER.info('Using custom URL "%s".', self.url)
             if urlo.username and urlo.password:
                 user = urlo.username
                 password = urlo.password
@@ -256,15 +256,15 @@ class Client(object):
         http_data = self._http_query(query, timeout)
         elapsed = time.time() - start
         if use_logger:
-            LOGGER.info('http request took %.3f s' % (elapsed))
+            LOGGER.info('http request took %.3f s', elapsed)
 
         try:
             data = json.loads(http_data)
         except ValueError as error:
             if use_logger:
-                LOGGER.error('Error: ' + str(error))
-                LOGGER.error('Request: \"%s\"' % (query))
-                LOGGER.error('HTTP data: \"%s\"' % (http_data))
+                LOGGER.error('Error: %s', str(error))
+                LOGGER.error('Request: "%s"', query)
+                LOGGER.error('HTTP data: "%s"', http_data)
             raise
 
         if use_logger:
@@ -357,8 +357,8 @@ class Client(object):
         Add a warning to the log if the Transmission RPC version is lower then the provided version.
         """
         if self.rpc_version < version:
-            LOGGER.warning('Using feature not supported by server. RPC version for server %d, feature introduced in %d.'
-                           % (self.rpc_version, version))
+            LOGGER.warning('Using feature not supported by server. RPC version for server %d, feature introduced in %d.',
+                           self.rpc_version, version)
 
     def add_torrent(self, torrent, timeout=None, **kwargs):
         """

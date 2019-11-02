@@ -11,9 +11,8 @@ import operator
 import os
 import base64
 import json
+import gzip
 
-from gzip import GzipFile
-from io import BytesIO
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -393,9 +392,7 @@ class Client:
             # use a python one instead
             torrent_file = urlopen(torrent)
             if torrent_file.info().get('Content-Encoding') == 'gzip':
-                buf = BytesIO(torrent_file.read())
-                gzip_file = GzipFile(fileobj=buf)
-                torrent_data = gzip_file.read()
+                torrent_data = gzip.decompress(torrent_file.read())
             else:
                 torrent_data = torrent_file.read()
             torrent_data = base64.b64encode(torrent_data).decode('utf-8')

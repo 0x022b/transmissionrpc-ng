@@ -9,9 +9,9 @@ from setuptools import setup
 setup(
     name='transmissionrpc-ng',
     version='0.12.0',
-    description='Python module that implements the Transmission BitTorent client RPC protocol.',
     author='Janne K',
     author_email='0x022b@gmail.com',
+    description='Python module that implements the Transmission BitTorent client RPC protocol.',
     url='https://github.com/0x022b/transmissionrpc-ng',
     keywords='transmission bittorent torrent',
     packages=['transmissionrpc'],

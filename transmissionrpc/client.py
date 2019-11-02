@@ -132,7 +132,7 @@ possible to provide a argument called ``timeout``.
 """
 
 
-class Client:
+class Client(object):
     """
     Client is the class handling the Transmission JSON-RPC client protocol.
     """
@@ -412,8 +412,8 @@ class Client:
                 filepath = parsed_uri.path
             elif parsed_uri.netloc:
                 filepath = parsed_uri.netloc
-            torrent_file = open(filepath, 'rb')
-            torrent_data = torrent_file.read()
+            with open(filepath, 'rb') as torrent_file:
+                torrent_data = torrent_file.read()
             torrent_data = base64.b64encode(torrent_data).decode('utf-8')
         if not torrent_data:
             if torrent.endswith('.torrent') or torrent.startswith('magnet:'):

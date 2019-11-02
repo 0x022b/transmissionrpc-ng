@@ -1,42 +1,49 @@
-TransmissionRPC Readme
-######################
+# transmissionrpc-ng
 
-Introduction
-============
+transmissionrpc-ng is a Python module implementing the JSON-RPC client protocol
+for the BitTorrent client Transmission.
 
-transmissionrpc is a python module implementing the json-rpc client protocol
-for the bittorent client Transmission. 
+## Getting started
 
-transmissionrpc is licensed under the MIT license.
+transmissionrpc-ng is compatible with Transmission 1.31 - 2.94.
 
-Getting started
-===============
+### Requirements
 
-transmissionrpc 0.12 is compatible with Transmission 1.31 - 2.82.
+transmissionrpc-ng requires:
 
-Requirements
-------------
+* Python >= 3.6
 
-transmissionrpc requires:
+### Install
 
- * Python >= 2.6
- * Six >= 1.1.0, https://pypi.python.org/pypi/six/
+transmissionrpc-ng can be installed by either by running `setup.py` or with
+`pip`, the package installer for Python.
 
-Install
--------
+```shell
+python3 setup.py install
+```
 
-transmissionrpc is installed by running setup.py
+```shell
+python3 -m pip install transmissionprc-ng
+```
 
-$ python setup.py install
+NOTE: You might need administrator privileges to install Python modules.
 
-NOTE: You might need administrator privileges to install python modules.
+## Running unit tests
 
-The setup program will take care of the simplejson requirement. Please refer to
-the Transmission documentation on how to install Transmission.
+```shell
+pipenv run python3 -m unittest test/*.py
+```
 
-Developer
-=========
+## License
 
-transmissionrpc is hosted by bitbucket at http://www.bitbucket.org/blueluna/transmissionrpc/.
+This project is licensed under the MIT License.
 
-Copyright (c) 2008-2014 Erik Svensson.
+## Developer
+
+transmissionrpc was originally developed by Erik Svensson. The original version
+is hosted at [Bitbucket][bitbucket].
+
+Copyright (c) 2008-2014 Erik Svensson\
+Copyright (c) 2019 Janne K
+
+[bitbucket]: http://www.bitbucket.org/blueluna/transmissionrpc/

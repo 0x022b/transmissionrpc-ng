@@ -11,7 +11,7 @@ from io import BytesIO
 from transmissionrpc.error import HTTPHandlerError
 
 
-class HTTPHandler:
+class HTTPHandler(object):
     """
     Prototype for HTTP handling.
     """

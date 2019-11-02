@@ -10,7 +10,7 @@ from http.client import BadStatusLine
 from transmissionrpc.error import HTTPHandlerError
 
 
-class HTTPHandler(object):
+class HTTPHandler:
     """
     Prototype for HTTP handling.
     """

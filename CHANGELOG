@@ -1,5 +1,11 @@
+transmissionrpc-ng 0.13.0
+-------------------------
+
+ * Remove non-printable characters from RPC responses
+ * Added support for gzip encoded torrents
+
 transmissionrpc-ng 0.12.0
-----------------------
+-------------------------
 
  * Renamed the fork to transmissionrpc-ng
  * Started using semantic versioning

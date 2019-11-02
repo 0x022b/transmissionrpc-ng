@@ -176,6 +176,16 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(r.hashString, 'A001')
         self.assertEqual(r.name, 'testtransfer1')
 
+        r = tc.add_torrent('file://' + os.path.join(data_path, 'ubuntu-12.04.2-alternate-amd64.iso.torrent'))
+        self.assertEqual(r.id, 2)
+        self.assertEqual(r.hashString, 'a21c45469c565f3fb9595e4e9707e6e9d45abca6')
+        self.assertEqual(r.name, 'ubuntu-12.04.2-alternate-amd64.iso')
+
+        r = tc.add_torrent('file://' + os.path.join(data_path, 'ubuntu-12.04.2-alternate-amd64.iso.torrent.gz'))
+        self.assertEqual(r.id, 3)
+        self.assertEqual(r.hashString, 'a21c45469c565f3fb9595e4e9707e6e9d45abca6')
+        self.assertEqual(r.name, 'ubuntu-12.04.2-alternate-amd64.iso')
+
     def testRemoveTorrent(self):
         tc = createClient(test_name='remove')
 

@@ -36,7 +36,7 @@ def get_status_new(code):
     return mapping[code]
 
 
-class Torrent(object):
+class Torrent:
     """
     Torrent is a class holding the data received from Transmission regarding a bittorrent transfer.
 

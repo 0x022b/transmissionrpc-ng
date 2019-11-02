@@ -6,12 +6,17 @@
 
 from setuptools import setup
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='transmissionrpc-ng',
     version='0.12.0',
-    description='Python module that implements the Transmission BitTorent client RPC protocol.',
     author='Janne K',
     author_email='0x022b@gmail.com',
+    description='Python module that implements the Transmission BitTorent client RPC protocol.',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/0x022b/transmissionrpc-ng',
     keywords='transmission bittorent torrent',
     packages=['transmissionrpc'],

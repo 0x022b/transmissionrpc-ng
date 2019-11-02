@@ -8,6 +8,3 @@ flake8 = ">=3.6"
 
 [packages]
 pycurl = ">=7.43"
-
-[requires]
-python_version = "3.6"

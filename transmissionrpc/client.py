@@ -28,9 +28,9 @@ def debug_httperror(error):
     Log the Transmission RPC HTTP error.
     """
     if sys.platform == 'win32':
-        m = error.message.decode(sys.stdout.encoding)
+        msg = error.message.decode(sys.stdout.encoding)
     else:
-        m = error.message
+        msg = error.message
     try:
         data = json.loads(error.data)
     except ValueError:
@@ -41,7 +41,7 @@ def debug_httperror(error):
                 'response': {
                     'url': error.url,
                     'code': error.code,
-                    'msg': m,
+                    'msg': msg,
                     'headers': error.headers,
                     'data': data,
                 }

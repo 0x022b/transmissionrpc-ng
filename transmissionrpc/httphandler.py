@@ -3,11 +3,11 @@
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
-import pycurl
 import re
 from base64 import b64encode
 from io import BytesIO
 
+import pycurl
 from transmissionrpc.error import HTTPHandlerError
 
 

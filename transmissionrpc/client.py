@@ -256,10 +256,10 @@ class Client:
         self._sequence += 1
         start = time.time()
         http_data = self._http_query(query, timeout)
-        if isinstance(http_data, binary_type):
-            http_data = text_type(http_data, encoding='utf-8', errors='replace')
-        is_printable = lambda c: unicodedata.category(c)[0] != 'C'
-        http_data = filter(is_printable, http_data)
+        if isinstance(http_data, bytes):
+            http_data = str(http_data, encoding='utf-8', errors='replace')
+        http_data = ''.join(list(filter(
+            lambda c: unicodedata.category(c)[0] != 'C', http_data)))
         elapsed = time.time() - start
         if use_logger:
             LOGGER.info('http request took %.3f s', elapsed)

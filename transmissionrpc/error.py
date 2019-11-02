@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
+# Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
-from six import string_types, integer_types
 
 class TransmissionError(Exception):
     """
-	This exception is raised when there has occurred an error related to
-	communication with Transmission. It is a subclass of Exception.
+    This exception is raised when there has occurred an error related to
+    communication with Transmission. It is a subclass of Exception.
     """
+
     def __init__(self, message='', original=None):
         Exception.__init__(self)
         self.message = message
@@ -21,11 +22,13 @@ class TransmissionError(Exception):
         else:
             return self.message
 
+
 class HTTPHandlerError(Exception):
     """
-	This exception is raised when there has occurred an error related to
-	the HTTP handler. It is a subclass of Exception.
+    This exception is raised when there has occurred an error related to
+    the HTTP handler. It is a subclass of Exception.
     """
+
     def __init__(self, httpurl=None, httpcode=None, httpmsg=None, httpheaders=None, httpdata=None):
         Exception.__init__(self)
         self.url = ''
@@ -33,15 +36,15 @@ class HTTPHandlerError(Exception):
         self.message = ''
         self.headers = {}
         self.data = ''
-        if isinstance(httpurl, string_types):
+        if isinstance(httpurl, str):
             self.url = httpurl
-        if isinstance(httpcode, integer_types):
+        if isinstance(httpcode, int):
             self.code = httpcode
-        if isinstance(httpmsg, string_types):
+        if isinstance(httpmsg, str):
             self.message = httpmsg
         if isinstance(httpheaders, dict):
             self.headers = httpheaders
-        if isinstance(httpdata, string_types):
+        if isinstance(httpdata, str):
             self.data = httpdata
 
     def __repr__(self):

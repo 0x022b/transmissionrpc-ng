@@ -1,9 +1,13 @@
-Transmissionrpc 0.12
---------------------
+transmissionrpc-ng 0.12.0
+----------------------
 
- * Features
+ * Renamed the fork to transmissionrpc-ng
+ * Started using semantic versioning
+ * Fixed lots of static code analysis issues
+ * Removed deprecated methods
+ * Dropped support for Python 2
 
- Transmissionrpc 0.11
+Transmissionrpc 0.11
 --------------------
 
  * Added support for Transmission RPC version 15.

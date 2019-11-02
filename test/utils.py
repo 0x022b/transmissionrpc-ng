@@ -6,7 +6,6 @@ import datetime
 import unittest
 import transmissionrpc.utils as tu
 
-from six import iteritems
 
 class utils(unittest.TestCase):
     def testFormatSize(self):
@@ -20,11 +19,11 @@ class utils(unittest.TestCase):
             1125899906842624: (1.0, 'PiB'),
             1152921504606846976: (1.0, 'EiB'),
         }
-        for size, expected in iteritems(table):
+        for size, expected in iter(table.items()):
             result = tu.format_size(size)
             self.assertAlmostEqual(result[0], expected[0], 4)
             self.assertEqual(result[1], expected[1])
-    
+
     def testFormatSpeed(self):
         table = {
             512: (512, 'B/s'),
@@ -36,11 +35,11 @@ class utils(unittest.TestCase):
             1125899906842624: (1.0, 'PiB/s'),
             1152921504606846976: (1.0, 'EiB/s'),
         }
-        for size, expected in iteritems(table):
+        for size, expected in iter(table.items()):
             result = tu.format_speed(size)
             self.assertAlmostEqual(result[0], expected[0], 4)
             self.assertEqual(result[1], expected[1])
-    
+
     def testFormatTimedelta(self):
         table = {
             datetime.timedelta(0, 0): '0 00:00:00',
@@ -51,18 +50,18 @@ class utils(unittest.TestCase):
             datetime.timedelta(1, 3661): '1 01:01:01',
             datetime.timedelta(13, 65660): '13 18:14:20',
         }
-        for delta, expected in iteritems(table):
+        for delta, expected in iter(table.items()):
             self.assertEqual(tu.format_timedelta(delta), expected)
-    
+
     def testFormatTimestamp(self):
         table = {
             0: '-',
             1: '1970-01-01 00:00:01',
             1129135532: '2005-10-12 16:45:32',
         }
-        for timestamp, expected in iteritems(table):
+        for timestamp, expected in iter(table.items()):
             self.assertEqual(tu.format_timestamp(timestamp, utc=True), expected)
-    
+
     def testInetAddress(self):
         table = {
             ('127.0.0.1:80', 2000): ('127.0.0.1', 80),
@@ -70,13 +69,13 @@ class utils(unittest.TestCase):
             (':80', 2000): ('localhost', 80),
             (':80', 2000, '127.0.0.1'): ('127.0.0.1', 80),
             ('0.0.0.0:443', 2000): ('0.0.0.0', 443),
-             ('localhost:443', 2000): ('localhost', 443),
+            ('localhost:443', 2000): ('localhost', 443),
         }
-        for args, expected in iteritems(table):
+        for args, expected in iter(table.items()):
             self.assertEqual(tu.inet_address(*args), expected)
-        
-        self.failUnlessRaises(tu.INetAddressError, tu.inet_address, '256.256.256.256', 2000)
-    
+
+        self.assertRaises(tu.INetAddressError, tu.inet_address, '256.256.256.256', 2000)
+
     def testRPCBool(self):
         table = {
             0: 0,
@@ -91,12 +90,14 @@ class utils(unittest.TestCase):
             True: 1,
             False: 0,
         }
-        for value, expected in iteritems(table):
+        for value, expected in iter(table.items()):
             self.assertEqual(tu.rpc_bool(value), expected)
+
 
 def suite():
     suite = unittest.TestLoader().loadTestsFromTestCase(utils)
     return suite
+
 
 if __name__ == '__main__':
     unittest.main()

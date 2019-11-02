@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
+# Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
 from transmissionrpc.utils import Field
 
-from six import iteritems, integer_types
 
 class Session(object):
     """
@@ -39,7 +39,7 @@ class Session(object):
         Update the session data from a Transmission JSON-RPC arguments dictionary
         """
         if isinstance(other, dict):
-            for key, value in iteritems(other):
+            for key, value in list(other.items()):
                 self._fields[key.replace('-', '_')] = Field(value, False)
         elif isinstance(other, Session):
             for key in list(other._fields.keys()):
@@ -63,7 +63,7 @@ class Session(object):
         for key in dirty:
             args[key] = self._fields[key].value
             self._fields[key] = self._fields[key]._replace(dirty=False)
-        if len(args) > 0:
+        if args:
             self._client.set_session(**args)
 
     def update(self, timeout=None):
@@ -88,13 +88,14 @@ class Session(object):
         """
         Set the peer port.
         """
-        if isinstance(port, integer_types):
+        if isinstance(port, int):
             self._fields['peer_port'] = Field(port, True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    peer_port = property(_get_peer_port, _set_peer_port, None, "Peer port. This is a mutator.")
+    peer_port = property(_get_peer_port, _set_peer_port,
+                         None, "Peer port. This is a mutator.")
 
     def _get_pex_enabled(self):
         """Is peer exchange enabled?"""
@@ -108,4 +109,5 @@ class Session(object):
         else:
             raise TypeError("Not a valid type")
 
-    pex_enabled = property(_get_pex_enabled, _set_pex_enabled, None, "Enable peer exchange. This is a mutator.")
+    pex_enabled = property(_get_pex_enabled, _set_pex_enabled,
+                           None, "Enable peer exchange. This is a mutator.")

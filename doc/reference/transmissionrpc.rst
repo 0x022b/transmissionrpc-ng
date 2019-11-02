@@ -282,7 +282,7 @@ with both id and hashString.
 Timeouts
 --------
 
-In Python 2.6 it is possible to supply a timeout to a HTTP request. This is
+It is possible to supply a timeout to a HTTP request. This is
 accessible through transmissionrpc by either changing the timeout property of
 a Client object or supply the named argument ``timeout`` in most methods of
 Client. The default timeout is 30 seconds.

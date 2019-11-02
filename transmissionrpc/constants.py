@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
+# Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
+# pylint: disable=line-too-long
 
 import logging
 
@@ -30,10 +32,9 @@ PRIORITY = mirror_dict({
     'high': TR_PRI_HIGH
 })
 
-TR_RATIOLIMIT_GLOBAL = 0  # follow the global settings
-TR_RATIOLIMIT_SINGLE = 1  # override the global settings, seeding until a certain ratio
-# override the global settings, seeding regardless of ratio
-TR_RATIOLIMIT_UNLIMITED = 2
+TR_RATIOLIMIT_GLOBAL = 0     # follow the global settings
+TR_RATIOLIMIT_SINGLE = 1     # override the global settings, seeding until a certain ratio
+TR_RATIOLIMIT_UNLIMITED = 2  # override the global settings, seeding regardless of ratio
 
 RATIO_LIMIT = mirror_dict({
     'global': TR_RATIOLIMIT_GLOBAL,
@@ -41,11 +42,9 @@ RATIO_LIMIT = mirror_dict({
     'unlimited': TR_RATIOLIMIT_UNLIMITED
 })
 
-TR_IDLELIMIT_GLOBAL = 0  # follow the global settings
-# override the global settings, seeding until a certain idle time
-TR_IDLELIMIT_SINGLE = 1
-# override the global settings, seeding regardless of activity
-TR_IDLELIMIT_UNLIMITED = 2
+TR_IDLELIMIT_GLOBAL = 0     # follow the global settings
+TR_IDLELIMIT_SINGLE = 1     # override the global settings, seeding until a certain idle time
+TR_IDLELIMIT_UNLIMITED = 2  # override the global settings, seeding regardless of activity
 
 IDLE_LIMIT = mirror_dict({
     'global': TR_RATIOLIMIT_GLOBAL,

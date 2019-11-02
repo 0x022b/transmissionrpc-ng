@@ -3,8 +3,6 @@
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
-import sys
-
 from urllib.request import Request, build_opener, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
 from urllib.error import HTTPError, URLError
 from http.client import BadStatusLine
@@ -61,10 +59,7 @@ class DefaultHTTPHandler(HTTPHandler):
     def request(self, url, query, headers, timeout):
         request = Request(url, query.encode('utf-8'), headers)
         try:
-            if (sys.version_info[0] == 2 and sys.version_info[1] > 5) or sys.version_info[0] > 2:
-                response = self.http_opener.open(request, timeout=timeout)
-            else:
-                response = self.http_opener.open(request)
+            response = self.http_opener.open(request, timeout=timeout)
         except HTTPError as error:
             if error.fp is None:
                 raise HTTPHandlerError(

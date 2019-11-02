@@ -3,34 +3,32 @@
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
+import base64
+import json
 import os
 import unittest
-import base64
 
-from six import iteritems, string_types, PY3
+from urllib.parse import urlparse
 
-if PY3:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
-
-import json
 import transmissionrpc.constants
-from transmissionrpc import TransmissionError, Client, HTTPHandler
+from transmissionrpc.client import Client
+from transmissionrpc.httphandler import HTTPHandler
+
 
 def tree_differences(a, b):
     return node_differences(a, b, '.')
 
+
 def node_differences(a, b, root):
     errors = []
     if isinstance(a, dict) and isinstance(b, dict):
-        for k, v in iteritems(a):
+        for k, v in iter(a.items()):
             node = root + '.' + k
             if k not in b:
                 errors.append('Field %s missing from b at %s' % (k, node))
             else:
                 errors.extend(node_differences(a[k], b[k], node))
-        for k, v in iteritems(b):
+        for k, v in iter(b.items()):
             node = root + '.' + k
             if k not in a:
                 errors.append('Field %s missing from a at %s' % (k, node))
@@ -45,6 +43,7 @@ def node_differences(a, b, root):
         if a != b:
             errors.append('Value %s != %s at %s' % (a[0:32], b[0:32], root))
     return errors
+
 
 class TestHTTPHandler(HTTPHandler):
     def __init__(self, test_name=None):
@@ -62,7 +61,7 @@ class TestHTTPHandler(HTTPHandler):
             fd.close()
             if 'test sequence' in test_data:
                 self.tests = test_data['test sequence']
-    
+
     def set_authentication(self, url, user, password):
         urlo = urlparse(url)
         if urlo.scheme == '':
@@ -70,17 +69,17 @@ class TestHTTPHandler(HTTPHandler):
         else:
             self.url = url
         if user and password:
-            if isinstance(user, string_types):
+            if isinstance(user, str):
                 self.user = user
             else:
                 raise TypeError('Invalid type for user.')
-            if isinstance(password, string_types):
+            if isinstance(password, str):
                 self.password = password
             else:
                 raise TypeError('Invalid type for password.')
         elif user or password:
             raise ValueError('User AND password or neither.')
-    
+
     def request(self, url, query, headers, timeout):
         response = {}
         if self.url and self.url != url:
@@ -91,7 +90,7 @@ class TestHTTPHandler(HTTPHandler):
         else:
             self.url = url
         q = json.loads(query)
-        
+
         if self.tests:
             test_data = self.tests[self.test_index]
             self.test_index += 1
@@ -106,6 +105,7 @@ class TestHTTPHandler(HTTPHandler):
             response['result'] = 'success'
         return json.dumps(response)
 
+
 def createClient(*args, **kwargs):
     test_name = None
     if 'test_name' in kwargs:
@@ -113,6 +113,7 @@ def createClient(*args, **kwargs):
         del kwargs['test_name']
     kwargs['http_handler'] = TestHTTPHandler(test_name)
     return Client(*args, **kwargs)
+
 
 class ClientTest(unittest.TestCase):
 
@@ -149,14 +150,14 @@ class ClientTest(unittest.TestCase):
         tc.timeout = '100.1'
         self.assertEqual(tc.timeout, 100.1)
         self.assertRaises(ValueError, tc._set_timeout, '10 years')
-            
+
     def testAddTorrent(self):
         data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
         tc = createClient(test_name='add_torrent_base64')
         torrent_path = os.path.join(data_path, 'ubuntu-12.04.2-alternate-amd64.iso.torrent')
-        data = open(torrent_path, 'rb').read()
-        data_b64 = base64.b64encode(data).decode('utf-8')
+        with open(torrent_path, 'rb') as data:
+            data_b64 = base64.b64encode(data.read()).decode('utf-8')
         r = tc.add_torrent(data_b64)
         self.assertEqual(r.id, 0)
         self.assertEqual(r.hashString, 'a21c45469c565f3fb9595e4e9707e6e9d45abca6')
@@ -175,30 +176,40 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(r.hashString, 'A001')
         self.assertEqual(r.name, 'testtransfer1')
 
+        r = tc.add_torrent('file://' + os.path.join(data_path, 'ubuntu-12.04.2-alternate-amd64.iso.torrent'))
+        self.assertEqual(r.id, 2)
+        self.assertEqual(r.hashString, 'a21c45469c565f3fb9595e4e9707e6e9d45abca6')
+        self.assertEqual(r.name, 'ubuntu-12.04.2-alternate-amd64.iso')
+
+        r = tc.add_torrent('file://' + os.path.join(data_path, 'ubuntu-12.04.2-alternate-amd64.iso.torrent.gz'))
+        self.assertEqual(r.id, 3)
+        self.assertEqual(r.hashString, 'a21c45469c565f3fb9595e4e9707e6e9d45abca6')
+        self.assertEqual(r.name, 'ubuntu-12.04.2-alternate-amd64.iso')
+
     def testRemoveTorrent(self):
         tc = createClient(test_name='remove')
-        
+
         tc.remove_torrent(['b000', 2, 3])
         tc.remove_torrent(1, delete_data=True)
         tc.remove_torrent('b002', delete_data=False)
 
     def testStartTorrent(self):
         tc = createClient(test_name='start')
-        
+
         tc.start_torrent(['abcdef', 20, 30])
         tc.start_torrent(1)
         tc.start_torrent('a0123456789')
 
     def testStopTorrent(self):
         tc = createClient(test_name='stop')
-        
+
         tc.stop_torrent(2)
         tc.stop_torrent('bad')
         tc.stop_torrent(['bad', 'ba5', '30', 20])
 
     def testVerifyTorrent(self):
         tc = createClient(test_name='verify')
-        
+
         tc.verify_torrent(10000)
         tc.verify_torrent('d')
         tc.verify_torrent(['a', 'b', 'c'])
@@ -230,8 +241,8 @@ class ClientTest(unittest.TestCase):
                 self.fail("Unknown torrent")
 
     def testGetTorrentsRange(self):
-        tc = createClient(test_name='get_torrents_2to3')        
-        r = tc.get_torrents([2,3])
+        tc = createClient(test_name='get_torrents_2to3')
+        r = tc.get_torrents([2, 3])
         for torrent in r:
             if torrent.id == 2:
                 self.assertEqual(torrent.name, 'ubuntu-10.04-server-amd64.iso')
@@ -241,8 +252,8 @@ class ClientTest(unittest.TestCase):
                 self.assertEqual(torrent.hashString, 'a33e98826003515e46ef5075fcbf4914b307abe2')
             else:
                 self.fail("Unknown torrent")
-        
-        tc = createClient(test_name='get_torrents_2to3')        
+
+        tc = createClient(test_name='get_torrents_2to3')
         r = tc.get_torrents("2:3")
         for torrent in r:
             if torrent.id == 2:
@@ -253,7 +264,7 @@ class ClientTest(unittest.TestCase):
                 self.assertEqual(torrent.hashString, 'a33e98826003515e46ef5075fcbf4914b307abe2')
             else:
                 self.fail("Unknown torrent")
-        
+
         tc = createClient(test_name='get_torrents_2to3')
         r = tc.get_torrents("2,3")
         for torrent in r:
@@ -265,7 +276,7 @@ class ClientTest(unittest.TestCase):
                 self.assertEqual(torrent.hashString, 'a33e98826003515e46ef5075fcbf4914b307abe2')
             else:
                 self.fail("Unknown torrent")
-        
+
         tc = createClient(test_name='get_torrents_2to3')
         r = tc.get_torrents("2 3")
         for torrent in r:
@@ -277,9 +288,9 @@ class ClientTest(unittest.TestCase):
                 self.assertEqual(torrent.hashString, 'a33e98826003515e46ef5075fcbf4914b307abe2')
             else:
                 self.fail("Unknown torrent")
-        
+
     def testGetTorrentsHashes(self):
-        tc = createClient(test_name='get_torrents_hashes')        
+        tc = createClient(test_name='get_torrents_hashes')
         r = tc.get_torrents(["ab8ea951c022d4745a9b06ab8020b952a52b71ca", "a33e98826003515e46ef5075fcbf4914b307abe2"])
         for torrent in r:
             if torrent.id == 2:
@@ -290,8 +301,8 @@ class ClientTest(unittest.TestCase):
                 self.assertEqual(torrent.hashString, 'a33e98826003515e46ef5075fcbf4914b307abe2')
             else:
                 self.fail("Unknown torrent")
-        
-        tc = createClient(test_name='get_torrents_hashes')        
+
+        tc = createClient(test_name='get_torrents_hashes')
         r = tc.get_torrents("ab8ea951c022d4745a9b06ab8020b952a52b71ca,a33e98826003515e46ef5075fcbf4914b307abe2")
         for torrent in r:
             if torrent.id == 2:
@@ -303,7 +314,7 @@ class ClientTest(unittest.TestCase):
             else:
                 self.fail("Unknown torrent")
 
-        tc = createClient(test_name='get_torrents_hashes')        
+        tc = createClient(test_name='get_torrents_hashes')
         r = tc.get_torrents("ab8ea951c022d4745a9b06ab8020b952a52b71ca a33e98826003515e46ef5075fcbf4914b307abe2")
         for torrent in r:
             if torrent.id == 2:
@@ -338,13 +349,14 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(parse_torrent_ids("A"), ["A"])
         self.assertEqual(parse_torrent_ids("a21c45469c565f3fb9595e4e9707e6e9d45abca6"), ["a21c45469c565f3fb9595e4e9707e6e9d45abca6"])
         self.assertEqual(parse_torrent_ids(",, "), [])
-        self.assertEqual(parse_torrent_ids("1,2,3"), [1,2,3])
-        self.assertEqual(parse_torrent_ids("1:3"), [1,2,3])
+        self.assertEqual(parse_torrent_ids("1,2,3"), [1, 2, 3])
+        self.assertEqual(parse_torrent_ids("1:3"), [1, 2, 3])
         self.assertRaises(ValueError, parse_torrent_ids, "A:3")
         self.assertRaises(ValueError, parse_torrent_ids, "T")
         self.assertEqual(parse_torrent_ids([10]), [10])
         self.assertEqual(parse_torrent_ids((10, 11)), [10, 11])
         self.assertRaises(ValueError, parse_torrent_ids, {10: 10})
+
 
 def suite():
     suite = unittest.TestLoader().loadTestsFromTestCase(ClientTest)

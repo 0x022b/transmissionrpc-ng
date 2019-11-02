@@ -2,16 +2,18 @@
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
+# pylint: disable=line-too-long
 
 import sys
 import re
 import time
 import operator
-import warnings
 import os
 import base64
 import json
 
+from gzip import GzipFile
+from io import BytesIO
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -21,8 +23,6 @@ from transmissionrpc.utils import LOGGER, get_arguments, make_rpc_name, argument
 from transmissionrpc.httphandler import DefaultHTTPHandler
 from transmissionrpc.torrent import Torrent
 from transmissionrpc.session import Session
-from gzip import GzipFile
-from io import BytesIO
 
 
 def debug_httperror(error):
@@ -30,9 +30,9 @@ def debug_httperror(error):
     Log the Transmission RPC HTTP error.
     """
     if sys.platform == 'win32':
-        m = error.message.decode(sys.stdout.encoding)
+        msg = error.message.decode(sys.stdout.encoding)
     else:
-        m = error.message
+        msg = error.message
     try:
         data = json.loads(error.data)
     except ValueError:
@@ -43,7 +43,7 @@ def debug_httperror(error):
                 'response': {
                     'url': error.url,
                     'code': error.code,
-                    'msg': m,
+                    'msg': msg,
                     'headers': error.headers,
                     'data': data,
                 }
@@ -121,21 +121,6 @@ def parse_torrent_ids(args):
     return ids
 
 
-"""
-Torrent ids
-
-Many functions in Client takes torrent id. A torrent id can either be id or
-hashString. When supplying multiple id's it is possible to use a list mixed
-with both id and hashString.
-
-Timeouts
-
-Since most methods results in HTTP requests against Transmission, it is
-possible to provide a argument called ``timeout``. Timeout is only effective
-when using Python 2.6 or later and the default timeout is 30 seconds.
-"""
-
-
 class Client:
     """
     Client is the class handling the Transmission JSON-RPC client protocol.
@@ -156,7 +141,7 @@ class Client:
                     ':' + str(urlo.port) + urlo.path
             else:
                 self.url = urlo.scheme + '://' + urlo.hostname + urlo.path
-            LOGGER.info('Using custom URL "' + self.url + '".')
+            LOGGER.info('Using custom URL "%s".', self.url)
             if urlo.username and urlo.password:
                 user = urlo.username
                 password = urlo.password
@@ -273,15 +258,15 @@ class Client:
         http_data = self._http_query(query, timeout)
         elapsed = time.time() - start
         if use_logger:
-            LOGGER.info('http request took %.3f s' % (elapsed))
+            LOGGER.info('http request took %.3f s', elapsed)
 
         try:
             data = json.loads(http_data)
         except ValueError as error:
             if use_logger:
-                LOGGER.error('Error: ' + str(error))
-                LOGGER.error('Request: \"%s\"' % (query))
-                LOGGER.error('HTTP data: \"%s\"' % (http_data))
+                LOGGER.error('Error: %s', str(error))
+                LOGGER.error('Request: "%s"', query)
+                LOGGER.error('HTTP data: "%s"', http_data)
             raise
 
         if use_logger:
@@ -374,8 +359,8 @@ class Client:
         Add a warning to the log if the Transmission RPC version is lower then the provided version.
         """
         if self.rpc_version < version:
-            LOGGER.warning('Using feature not supported by server. RPC version for server %d, feature introduced in %d.'
-                           % (self.rpc_version, version))
+            LOGGER.warning('Using feature not supported by server. RPC version for server %d, feature introduced in %d.',
+                           self.rpc_version, version)
 
     def add_torrent(self, torrent, timeout=None, **kwargs):
         """
@@ -421,8 +406,8 @@ class Client:
                 filepath = parsed_uri.path
             elif parsed_uri.netloc:
                 filepath = parsed_uri.netloc
-            torrent_file = open(filepath, 'rb')
-            torrent_data = torrent_file.read()
+            with open(filepath, 'rb') as torrent_file:
+                torrent_data = torrent_file.read()
             torrent_data = base64.b64encode(torrent_data).decode('utf-8')
         if not torrent_data:
             if torrent.endswith('.torrent') or torrent.startswith('magnet:'):
@@ -524,27 +509,27 @@ class Client:
 
     def get_files(self, ids=None, timeout=None):
         """
-    	Get list of files for provided torrent id(s). If ids is empty,
-    	information for all torrents are fetched. This function returns a dictionary
-    	for each requested torrent id holding the information about the files.
+        Get list of files for provided torrent id(s). If ids is empty,
+        information for all torrents are fetched. This function returns a dictionary
+        for each requested torrent id holding the information about the files.
 
-    	::
+        ::
 
-    		{
-    			<torrent id>: {
-    				<file id>: {
-    					'name': <file name>,
-    					'size': <file size in bytes>,
-    					'completed': <bytes completed>,
-    					'priority': <priority ('high'|'normal'|'low')>,
-    					'selected': <selected for download (True|False)>
-    				}
+            {
+                <torrent id>: {
+                    <file id>: {
+                        'name': <file name>,
+                        'size': <file size in bytes>,
+                        'completed': <bytes completed>,
+                        'priority': <priority ('high'|'normal'|'low')>,
+                        'selected': <selected for download (True|False)>
+                    }
 
-    				...
-    			}
+                    ...
+                }
 
-    			...
-    		}
+                ...
+            }
         """
         fields = ['id', 'name', 'hashString', 'files', 'priorities', 'wanted']
         request_result = self._request(
@@ -557,22 +542,22 @@ class Client:
     def set_files(self, items, timeout=None):
         """
         Set file properties. Takes a dictionary with similar contents as the result
-    	of `get_files`.
+        of `get_files`.
 
-    	::
+        ::
 
-    		{
-    			<torrent id>: {
-    				<file id>: {
-    					'priority': <priority ('high'|'normal'|'low')>,
-    					'selected': <selected for download (True|False)>
-    				}
+            {
+                <torrent id>: {
+                    <file id>: {
+                        'priority': <priority ('high'|'normal'|'low')>,
+                        'selected': <selected for download (True|False)>
+                    }
 
-    				...
-    			}
+                    ...
+                }
 
-    			...
-    		}
+                ...
+            }
         """
         if not isinstance(items, dict):
             raise ValueError('Invalid file description')
@@ -615,8 +600,8 @@ class Client:
 
     def change_torrent(self, ids, timeout=None, **kwargs):
         """
-    	Change torrent parameters for the torrent(s) with the supplied id's. The
-    	parameters are:
+        Change torrent parameters for the torrent(s) with the supplied id's. The
+        parameters are:
 
         ============================ ===== =============== =======================================================================================
         Argument                     RPC   Replaced by     Description
@@ -648,8 +633,8 @@ class Client:
         ``uploadLimited``            5 -                   Enable upload speed limiter.
         ============================ ===== =============== =======================================================================================
 
-    	.. NOTE::
-    	   transmissionrpc will try to automatically fix argument errors.
+        .. NOTE::
+           transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
         for key, value in list(kwargs.items()):
@@ -720,8 +705,9 @@ class Client:
         """
         Get session parameters. See the Session class for more information.
         """
-        self._request('session-get', timeout=timeout)
-        self._update_server_version()
+        if self.session is None:
+            self._request('session-get', timeout=timeout)
+            self._update_server_version()
         return self.session
 
     def set_session(self, timeout=None, **kwargs):
@@ -779,7 +765,7 @@ class Client:
         ================================ ===== ================= ==========================================================================================================================
 
         .. NOTE::
-    	   transmissionrpc will try to automatically fix argument errors.
+           transmissionrpc will try to automatically fix argument errors.
         """
         args = {}
         for key, value in list(kwargs.items()):

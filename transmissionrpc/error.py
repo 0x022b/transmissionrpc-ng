@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
+# Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
 
 
 class TransmissionError(Exception):
     """
-	This exception is raised when there has occurred an error related to
-	communication with Transmission. It is a subclass of Exception.
+    This exception is raised when there has occurred an error related to
+    communication with Transmission. It is a subclass of Exception.
     """
 
     def __init__(self, message='', original=None):
@@ -24,8 +25,8 @@ class TransmissionError(Exception):
 
 class HTTPHandlerError(Exception):
     """
-	This exception is raised when there has occurred an error related to
-	the HTTP handler. It is a subclass of Exception.
+    This exception is raised when there has occurred an error related to
+    the HTTP handler. It is a subclass of Exception.
     """
 
     def __init__(self, httpurl=None, httpcode=None, httpmsg=None, httpheaders=None, httpdata=None):

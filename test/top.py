@@ -5,6 +5,7 @@
 import unittest
 import transmissionrpc
 
+
 class TopTest(unittest.TestCase):
 
     def testConstants(self):
@@ -16,6 +17,7 @@ class TopTest(unittest.TestCase):
         self.assertTrue(isinstance(transmissionrpc.__license__, str))
 
         self.assertEqual('{0}.{1}'.format(transmissionrpc.__version_major__, transmissionrpc.__version_minor__), transmissionrpc.__version__)
+
 
 def suite():
     suite = unittest.TestLoader().loadTestsFromTestCase(TopTest)

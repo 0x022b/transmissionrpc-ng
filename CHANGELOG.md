@@ -3,6 +3,11 @@
 This project is using [Semantic Versioning 2.0.0][semver] starting from release
 0.12.0.
 
+## transmissionrpc-ng 0.13.1
+
+- Fix package metadata
+- Prettify documentation
+
 ## transmissionrpc-ng 0.13.0
 
 - Remove non-printable characters from RPC responses

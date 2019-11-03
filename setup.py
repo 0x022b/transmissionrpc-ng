@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='transmissionrpc-ng',
-    version='0.13.0',
+    version='0.13.1',
     author='Janne K',
     author_email='0x022b@gmail.com',
     description='Python module that implements the Transmission BitTorent client RPC protocol.',

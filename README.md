@@ -1,5 +1,11 @@
 # transmissionrpc-ng
 
+![PyPI](https://img.shields.io/pypi/v/transmissionrpc-ng?style=for-the-badge)
+![CircleCI](https://img.shields.io/circleci/build/github/0x022b/transmissionrpc-ng?style=for-the-badge)
+![LGTM Alerts](https://img.shields.io/lgtm/alerts/github/0x022b/transmissionrpc-ng?style=for-the-badge)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/transmissionrpc-ng?style=for-the-badge)
+![GitHub](https://img.shields.io/github/license/0x022b/transmissionrpc-ng?style=for-the-badge)
+
 **transmissionrpc-ng** is a Python module implementing the JSON-RPC client
 protocol for the BitTorrent client Transmission.
 

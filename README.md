@@ -1,7 +1,7 @@
 # transmissionrpc-ng
 
-transmissionrpc-ng is a Python module implementing the JSON-RPC client protocol
-for the BitTorrent client Transmission.
+**transmissionrpc-ng** is a Python module implementing the JSON-RPC client
+protocol for the BitTorrent client Transmission.
 
 ## Getting started
 
@@ -34,16 +34,19 @@ NOTE: You might need administrator privileges to install Python modules.
 pipenv run python3 -m unittest test/*.py
 ```
 
+## Changelog
+
+See [CHANGELOG][changelog].
+
 ## License
 
 This project is licensed under the MIT License.
 
-## Developer
+## Developers
 
-transmissionrpc was originally developed by Erik Svensson. The original version
-is hosted at [Bitbucket][bitbucket].
+Copyright (c) 2008-2014 [Erik Svensson][blueluna]\
+Copyright (c) 2019 [Janne K][0x022b]
 
-Copyright (c) 2008-2014 Erik Svensson\
-Copyright (c) 2019 Janne K
-
-[bitbucket]: http://www.bitbucket.org/blueluna/transmissionrpc/
+[0x022b]: https://github.com/0x022b
+[blueluna]: https://www.bitbucket.org/blueluna
+[changelog]: https://github.com/0x022b/transmissionrpc-ng/blob/master/CHANGELOG.md

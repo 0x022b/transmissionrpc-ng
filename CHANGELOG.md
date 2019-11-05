@@ -3,6 +3,11 @@
 This project is using [Semantic Versioning 2.0.0][semver] starting from release
 0.12.0.
 
+## transmissionrpc-ng 0.14.0
+
+- Replace urllib.request with PycURL
+- Minor tweaks and fixes
+
 ## transmissionrpc-ng 0.13.1
 
 - Fix package metadata

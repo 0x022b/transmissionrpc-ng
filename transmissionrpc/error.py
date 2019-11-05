@@ -10,7 +10,7 @@ class TransmissionError(Exception):
     communication with Transmission. It is a subclass of Exception.
     """
 
-    def __init__(self, message='', original=None):
+    def __init__(self, message="", original=None):
         Exception.__init__(self)
         self.message = message
         self.original = original
@@ -18,7 +18,11 @@ class TransmissionError(Exception):
     def __str__(self):
         if self.original:
             original_name = type(self.original).__name__
-            return '%s Original exception: %s, "%s"' % (self.message, original_name, str(self.original))
+            return '%s Original exception: %s, "%s"' % (
+                self.message,
+                original_name,
+                str(self.original),
+            )
         else:
             return self.message
 
@@ -29,13 +33,15 @@ class HTTPHandlerError(Exception):
     the HTTP handler. It is a subclass of Exception.
     """
 
-    def __init__(self, httpurl=None, httpcode=None, httpmsg=None, httpheaders=None, httpdata=None):
+    def __init__(
+        self, httpurl=None, httpcode=None, httpmsg=None, httpheaders=None, httpdata=None
+    ):
         Exception.__init__(self)
-        self.url = ''
+        self.url = ""
         self.code = 600
-        self.message = ''
+        self.message = ""
         self.headers = {}
-        self.data = ''
+        self.data = ""
         if isinstance(httpurl, str):
             self.url = httpurl
         if isinstance(httpcode, int):
@@ -48,10 +54,10 @@ class HTTPHandlerError(Exception):
             self.data = httpdata
 
     def __repr__(self):
-        return '<HTTPHandlerError %d, %s>' % (self.code, self.message)
+        return "<HTTPHandlerError %d, %s>" % (self.code, self.message)
 
     def __str__(self):
-        return 'HTTPHandlerError %d: %s' % (self.code, self.message)
+        return "HTTPHandlerError %d: %s" % (self.code, self.message)
 
     def __unicode__(self):
-        return 'HTTPHandlerError %d: %s' % (self.code, self.message)
+        return "HTTPHandlerError %d: %s" % (self.code, self.message)

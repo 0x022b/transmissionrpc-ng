@@ -7,4 +7,5 @@ jobs:
       - checkout
       - run:
           command: |
-            python -m unittest test/*.py
+            pipenv install
+            pipenv run python -m unittest test/*.py

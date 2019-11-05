@@ -19,8 +19,8 @@ from transmissionrpc.utils import add_stdout_logger, add_file_logger  # noqa: F4
 
 __author__ = "Janne K <0x022b@gmail.com>"
 __version_major__ = 0
-__version_minor__ = 13
-__version_patch__ = 1
+__version_minor__ = 14
+__version_patch__ = 0
 __version__ = "{0}.{1}.{2}".format(
     __version_major__, __version_minor__, __version_patch__
 )

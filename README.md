@@ -38,6 +38,7 @@ NOTE: You might need administrator privileges to install Python modules.
 ## Running unit tests
 
 ```shell
+pipenv install
 pipenv run python3 -m unittest test/*.py
 ```
 

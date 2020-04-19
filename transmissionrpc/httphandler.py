@@ -48,6 +48,7 @@ class DefaultHTTPHandler(HTTPHandler):
 
     def __init__(self):
         HTTPHandler.__init__(self)
+        self._authorization = None
 
     def _response_encoding(self, headers):
         encoding = None

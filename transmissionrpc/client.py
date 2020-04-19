@@ -446,19 +446,19 @@ class Client:
             # use a python one instead
             try:
                 torrent_file = urlopen(torrent)
-                if torrent_file.info().get('Content-Encoding') == 'gzip':
+                if torrent_file.info().get("Content-Encoding") == "gzip":
                     torrent_data = gzip.decompress(torrent_file.read())
                 else:
                     torrent_data = torrent_file.read()
-                torrent_data = base64.b64encode(torrent_data).decode('utf-8')
+                torrent_data = base64.b64encode(torrent_data).decode("utf-8")
             except HTTPError as e:
                 # follow links that directly redirect to a magnet (redirects to
                 # non-http/ftp files return a 302 error)
-                if e.code == 302 and e.url.startswith('magnet:'):
+                if e.code == 302 and e.url.startswith("magnet:"):
                     return self.add_torrent(e.url, timeout=timeout, **kwargs)
                 else:
                     raise e
-        if parsed_uri.scheme in ['file']:
+        if parsed_uri.scheme in ["file"]:
             filepath = torrent
             # uri decoded different on linux / windows ?
             if parsed_uri.path:

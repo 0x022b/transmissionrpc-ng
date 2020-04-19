@@ -26,7 +26,8 @@ class HTTPHandler:
          * password, the authentication password.
         """
         raise NotImplementedError(
-            "Bad HTTPHandler, failed to implement set_authentication.")
+            "Bad HTTPHandler, failed to implement set_authentication."
+        )
 
     def request(self, url, query, headers, timeout):
         """
@@ -37,8 +38,7 @@ class HTTPHandler:
          * headers, a dictionary of headers to send.
          * timeout, requested request timeout in seconds.
         """
-        raise NotImplementedError(
-            "Bad HTTPHandler, failed to implement request.")
+        raise NotImplementedError("Bad HTTPHandler, failed to implement request.")
 
 
 class DefaultHTTPHandler(HTTPHandler):
@@ -55,9 +55,9 @@ class DefaultHTTPHandler(HTTPHandler):
 
         # Figure out what encoding was sent with the response, if any.
         # Check against lowercased header name.
-        if headers and 'content-type' in headers:
-            content_type = headers['content-type'].lower()
-            match = re.search(r'charset=(\S+)', content_type)
+        if headers and "content-type" in headers:
+            content_type = headers["content-type"].lower()
+            match = re.search(r"charset=(\S+)", content_type)
             if match:
                 encoding = match.group(1)
 
@@ -65,7 +65,7 @@ class DefaultHTTPHandler(HTTPHandler):
             # Default encoding for HTML is iso-8859-1.
             # Other content types may have different default encoding,
             # or in case of binary data, may have no encoding at all.
-            encoding = 'iso-8859-1'
+            encoding = "iso-8859-1"
 
         return encoding
 
@@ -73,15 +73,15 @@ class DefaultHTTPHandler(HTTPHandler):
         headers = {}
 
         # HTTP standard specifies that headers are encoded in iso-8859-1.
-        for line in buffer.getvalue().decode('iso-8859-1').splitlines():
+        for line in buffer.getvalue().decode("iso-8859-1").splitlines():
             # Header lines include the first status line (HTTP/1.x ...).
             # We are going to ignore all lines that don't have a colon in them.
             # This will botch headers that are split on multiple lines...
-            if ':' not in line:
+            if ":" not in line:
                 continue
 
             # Break the header line into header name and value.
-            name, value = line.split(':', 1)
+            name, value = line.split(":", 1)
 
             # Remove whitespace that may be present.
             # Header lines include the trailing newline, and there may be
@@ -101,13 +101,14 @@ class DefaultHTTPHandler(HTTPHandler):
 
     def set_authentication(self, uri, login, password):
         self._authorization = b64encode(
-            bytearray('{}:{}'.format(login, password), 'utf-8')).decode('utf-8')
+            bytearray("{}:{}".format(login, password), "utf-8")
+        ).decode("utf-8")
 
     def request(self, url, query, headers, timeout):
-        request_headers = ['{}: {}'.format(k, v) for k, v in headers.items()]
+        request_headers = ["{}: {}".format(k, v) for k, v in headers.items()]
 
         if self._authorization:
-            request_headers += ['Authorization: Basic {}'.format(self._authorization)]
+            request_headers += ["Authorization: Basic {}".format(self._authorization)]
 
         buf1, buf2 = BytesIO(), BytesIO()
         c = pycurl.Curl()
@@ -129,4 +130,5 @@ class DefaultHTTPHandler(HTTPHandler):
             return response_body
         else:
             raise HTTPHandlerError(
-                url, response_code, None, response_headers, response_body)
+                url, response_code, None, response_headers, response_body
+            )

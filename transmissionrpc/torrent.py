@@ -13,11 +13,11 @@ from transmissionrpc.utils import Field, format_timedelta
 def get_status_old(code):
     """Get the torrent status using old status codes"""
     mapping = {
-        (1 << 0): 'check pending',
-        (1 << 1): 'checking',
-        (1 << 2): 'downloading',
-        (1 << 3): 'seeding',
-        (1 << 4): 'stopped',
+        (1 << 0): "check pending",
+        (1 << 1): "checking",
+        (1 << 2): "downloading",
+        (1 << 3): "seeding",
+        (1 << 4): "stopped",
     }
     return mapping[code]
 
@@ -25,13 +25,13 @@ def get_status_old(code):
 def get_status_new(code):
     """Get the torrent status using new status codes"""
     mapping = {
-        0: 'stopped',
-        1: 'check pending',
-        2: 'checking',
-        3: 'download pending',
-        4: 'downloading',
-        5: 'seed pending',
-        6: 'seeding',
+        0: "stopped",
+        1: "check pending",
+        2: "checking",
+        3: "download pending",
+        4: "downloading",
+        5: "seed pending",
+        6: "seeding",
     }
     return mapping[code]
 
@@ -45,8 +45,8 @@ class Torrent:
     """
 
     def __init__(self, client, fields):
-        if 'id' not in fields:
-            raise ValueError('Torrent requires an id')
+        if "id" not in fields:
+            raise ValueError("Torrent requires an id")
         self._fields = {}
         self._update_fields(fields)
         self._incoming_pending = False
@@ -59,8 +59,8 @@ class Torrent:
             codec = sys.getdefaultencoding()
         name = None
         # try to find name
-        if 'name' in self._fields:
-            name = self._fields['name'].value
+        if "name" in self._fields:
+            name = self._fields["name"].value
         # if name is unicode, try to decode
         if isinstance(name, str):
             try:
@@ -70,19 +70,19 @@ class Torrent:
         return name
 
     def __repr__(self):
-        tid = self._fields['id'].value
+        tid = self._fields["id"].value
         name = self._get_name_string()
         if isinstance(name, str):
-            return '<Torrent %d \"%s\">' % (tid, name)
+            return '<Torrent %d "%s">' % (tid, name)
         else:
-            return '<Torrent %d>' % (tid)
+            return "<Torrent %d>" % (tid)
 
     def __str__(self):
         name = self._get_name_string()
         if isinstance(name, str):
-            return 'Torrent \"%s\"' % (name)
+            return 'Torrent "%s"' % (name)
         else:
-            return 'Torrent'
+            return "Torrent"
 
     def __copy__(self):
         return Torrent(self._client, self._fields)
@@ -91,7 +91,7 @@ class Torrent:
         try:
             return self._fields[name].value
         except KeyError:
-            raise AttributeError('No attribute %s' % name)
+            raise AttributeError("No attribute %s" % name)
 
     def _rpc_version(self):
         """Get the Transmission RPC API version."""
@@ -101,8 +101,19 @@ class Torrent:
 
     def _dirty_fields(self):
         """Enumerate changed fields"""
-        outgoing_keys = ['bandwidthPriority', 'downloadLimit', 'downloadLimited', 'peer_limit', 'queuePosition',
-                         'seedIdleLimit', 'seedIdleMode', 'seedRatioLimit', 'seedRatioMode', 'uploadLimit', 'uploadLimited']
+        outgoing_keys = [
+            "bandwidthPriority",
+            "downloadLimit",
+            "downloadLimited",
+            "peer_limit",
+            "queuePosition",
+            "seedIdleLimit",
+            "seedIdleMode",
+            "seedRatioLimit",
+            "seedRatioMode",
+            "uploadLimit",
+            "uploadLimited",
+        ]
         fields = []
         for key in outgoing_keys:
             if key in self._fields and self._fields[key].dirty:
@@ -125,17 +136,17 @@ class Torrent:
         """
         if isinstance(other, dict):
             for key, value in list(other.items()):
-                self._fields[key.replace('-', '_')] = Field(value, False)
+                self._fields[key.replace("-", "_")] = Field(value, False)
         elif isinstance(other, Torrent):
             for key in list(other._fields.keys()):
                 self._fields[key] = Field(other._fields[key].value, False)
         else:
-            raise ValueError('Cannot update with supplied data')
+            raise ValueError("Cannot update with supplied data")
         self._incoming_pending = False
 
     def _status(self):
         """Get the torrent status"""
-        code = self._fields['status'].value
+        code = self._fields["status"].value
         if self._rpc_version() >= 14:
             return get_status_new(code)
         else:
@@ -161,20 +172,21 @@ class Torrent:
             }
         """
         result = {}
-        if 'files' in self._fields:
-            files = self._fields['files'].value
+        if "files" in self._fields:
+            files = self._fields["files"].value
             indices = list(range(len(files)))
-            priorities = self._fields['priorities'].value
-            wanted = self._fields['wanted'].value
+            priorities = self._fields["priorities"].value
+            wanted = self._fields["wanted"].value
             for item in zip(indices, files, priorities, wanted):
                 selected = True if item[3] else False
                 priority = PRIORITY[item[2]]
                 result[item[0]] = {
-                    'selected': selected,
-                    'priority': priority,
-                    'size': item[1]['length'],
-                    'name': item[1]['name'],
-                    'completed': item[1]['bytesCompleted']}
+                    "selected": selected,
+                    "priority": priority,
+                    "size": item[1]["length"],
+                    "name": item[1]["name"],
+                    "completed": item[1]["bytesCompleted"],
+                }
         return result
 
     @property
@@ -190,8 +202,8 @@ class Torrent:
     def progress(self):
         """Get the download progress in percent."""
         try:
-            size = self._fields['sizeWhenDone'].value
-            left = self._fields['leftUntilDone'].value
+            size = self._fields["sizeWhenDone"].value
+            left = self._fields["leftUntilDone"].value
             return 100.0 * (size - left) / float(size)
         except ZeroDivisionError:
             return 0.0
@@ -199,36 +211,36 @@ class Torrent:
     @property
     def ratio(self):
         """Get the upload/download ratio."""
-        return float(self._fields['uploadRatio'].value)
+        return float(self._fields["uploadRatio"].value)
 
     @property
     def eta(self):
         """Get the "eta" as datetime.timedelta."""
-        eta = self._fields['eta'].value
+        eta = self._fields["eta"].value
         if eta >= 0:
             return datetime.timedelta(seconds=eta)
         else:
-            raise ValueError('eta not valid')
+            raise ValueError("eta not valid")
 
     @property
     def date_active(self):
         """Get the attribute "activityDate" as datetime.datetime."""
-        return datetime.datetime.fromtimestamp(self._fields['activityDate'].value)
+        return datetime.datetime.fromtimestamp(self._fields["activityDate"].value)
 
     @property
     def date_added(self):
         """Get the attribute "addedDate" as datetime.datetime."""
-        return datetime.datetime.fromtimestamp(self._fields['addedDate'].value)
+        return datetime.datetime.fromtimestamp(self._fields["addedDate"].value)
 
     @property
     def date_started(self):
         """Get the attribute "startDate" as datetime.datetime."""
-        return datetime.datetime.fromtimestamp(self._fields['startDate'].value)
+        return datetime.datetime.fromtimestamp(self._fields["startDate"].value)
 
     @property
     def date_done(self):
         """Get the attribute "doneDate" as datetime.datetime. returns None if "doneDate" is invalid."""
-        done_date = self._fields['doneDate'].value
+        done_date = self._fields["doneDate"].value
         # Transmission might forget to set doneDate which is initialized to zero, so if doneDate is zero return None
         if done_date == 0:
             return None
@@ -243,11 +255,11 @@ class Torrent:
         * If eta is -2 the result is 'unknown'
         * Otherwise eta is formatted as <days> <hours>:<minutes>:<seconds>.
         """
-        eta = self._fields['eta'].value
+        eta = self._fields["eta"].value
         if eta == -1:
-            return 'not available'
+            return "not available"
         elif eta == -2:
-            return 'unknown'
+            return "unknown"
         else:
             return format_timedelta(self.eta)
 
@@ -256,8 +268,8 @@ class Torrent:
         Get the download limit.
         Can be a number or None.
         """
-        if self._fields['downloadLimited'].value:
-            return self._fields['downloadLimit'].value
+        if self._fields["downloadLimited"].value:
+            return self._fields["downloadLimit"].value
         else:
             return None
 
@@ -267,43 +279,48 @@ class Torrent:
         Can be a number, 'session' or None.
         """
         if isinstance(limit, int):
-            self._fields['downloadLimited'] = Field(True, True)
-            self._fields['downloadLimit'] = Field(limit, True)
+            self._fields["downloadLimited"] = Field(True, True)
+            self._fields["downloadLimit"] = Field(limit, True)
             self._push()
         elif limit is None:
-            self._fields['downloadLimited'] = Field(False, True)
+            self._fields["downloadLimited"] = Field(False, True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    download_limit = property(_get_download_limit, _set_download_limit,
-                              None, "Download limit in Kbps or None. This is a mutator.")
+    download_limit = property(
+        _get_download_limit,
+        _set_download_limit,
+        None,
+        "Download limit in Kbps or None. This is a mutator.",
+    )
 
     def _get_peer_limit(self):
         """
         Get the peer limit.
         """
-        return self._fields['peer_limit'].value
+        return self._fields["peer_limit"].value
 
     def _set_peer_limit(self, limit):
         """
         Set the peer limit.
         """
         if isinstance(limit, int):
-            self._fields['peer_limit'] = Field(limit, True)
+            self._fields["peer_limit"] = Field(limit, True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    peer_limit = property(_get_peer_limit, _set_peer_limit,
-                          None, "Peer limit. This is a mutator.")
+    peer_limit = property(
+        _get_peer_limit, _set_peer_limit, None, "Peer limit. This is a mutator."
+    )
 
     def _get_priority(self):
         """
         Get the priority as string.
         Can be one of 'low', 'normal', 'high'.
         """
-        return PRIORITY[self._fields['bandwidthPriority'].value]
+        return PRIORITY[self._fields["bandwidthPriority"].value]
 
     def _set_priority(self, priority):
         """
@@ -311,49 +328,60 @@ class Torrent:
         Can be one of 'low', 'normal', 'high'.
         """
         if isinstance(priority, str):
-            self._fields['bandwidthPriority'] = Field(PRIORITY[priority], True)
+            self._fields["bandwidthPriority"] = Field(PRIORITY[priority], True)
             self._push()
 
-    priority = property(_get_priority, _set_priority, None,
-                        "Bandwidth priority as string. Can be one of 'low', 'normal', 'high'. This is a mutator.")
+    priority = property(
+        _get_priority,
+        _set_priority,
+        None,
+        "Bandwidth priority as string. Can be one of 'low', 'normal', 'high'. This is a mutator.",
+    )
 
     def _get_seed_idle_limit(self):
         """
         Get the seed idle limit in minutes.
         """
-        return self._fields['seedIdleLimit'].value
+        return self._fields["seedIdleLimit"].value
 
     def _set_seed_idle_limit(self, limit):
         """
         Set the seed idle limit in minutes.
         """
         if isinstance(limit, int):
-            self._fields['seedIdleLimit'] = Field(limit, True)
+            self._fields["seedIdleLimit"] = Field(limit, True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    seed_idle_limit = property(_get_seed_idle_limit, _set_seed_idle_limit, None,
-                               "Torrent seed idle limit in minutes. Also see seed_idle_mode. This is a mutator.")
+    seed_idle_limit = property(
+        _get_seed_idle_limit,
+        _set_seed_idle_limit,
+        None,
+        "Torrent seed idle limit in minutes. Also see seed_idle_mode. This is a mutator.",
+    )
 
     def _get_seed_idle_mode(self):
         """
         Get the seed ratio mode as string. Can be one of 'global', 'single' or 'unlimited'.
         """
-        return IDLE_LIMIT[self._fields['seedIdleMode'].value]
+        return IDLE_LIMIT[self._fields["seedIdleMode"].value]
 
     def _set_seed_idle_mode(self, mode):
         """
         Set the seed ratio mode as string. Can be one of 'global', 'single' or 'unlimited'.
         """
         if isinstance(mode, str):
-            self._fields['seedIdleMode'] = Field(IDLE_LIMIT[mode], True)
+            self._fields["seedIdleMode"] = Field(IDLE_LIMIT[mode], True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    seed_idle_mode = property(_get_seed_idle_mode, _set_seed_idle_mode, None,
-                              """
+    seed_idle_mode = property(
+        _get_seed_idle_mode,
+        _set_seed_idle_mode,
+        None,
+        """
         Seed idle mode as string. Can be one of 'global', 'single' or 'unlimited'.
 
          * global, use session seed idle limit.
@@ -361,46 +389,53 @@ class Torrent:
          * unlimited, no seed idle limit.
 
         This is a mutator.
-        """
-                              )
+        """,
+    )
 
     def _get_seed_ratio_limit(self):
         """
         Get the seed ratio limit as float.
         """
-        return float(self._fields['seedRatioLimit'].value)
+        return float(self._fields["seedRatioLimit"].value)
 
     def _set_seed_ratio_limit(self, limit):
         """
         Set the seed ratio limit as float.
         """
         if isinstance(limit, (int, float)) and limit >= 0.0:
-            self._fields['seedRatioLimit'] = Field(float(limit), True)
+            self._fields["seedRatioLimit"] = Field(float(limit), True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    seed_ratio_limit = property(_get_seed_ratio_limit, _set_seed_ratio_limit, None,
-                                "Torrent seed ratio limit as float. Also see seed_ratio_mode. This is a mutator.")
+    seed_ratio_limit = property(
+        _get_seed_ratio_limit,
+        _set_seed_ratio_limit,
+        None,
+        "Torrent seed ratio limit as float. Also see seed_ratio_mode. This is a mutator.",
+    )
 
     def _get_seed_ratio_mode(self):
         """
         Get the seed ratio mode as string. Can be one of 'global', 'single' or 'unlimited'.
         """
-        return RATIO_LIMIT[self._fields['seedRatioMode'].value]
+        return RATIO_LIMIT[self._fields["seedRatioMode"].value]
 
     def _set_seed_ratio_mode(self, mode):
         """
         Set the seed ratio mode as string. Can be one of 'global', 'single' or 'unlimited'.
         """
         if isinstance(mode, str):
-            self._fields['seedRatioMode'] = Field(RATIO_LIMIT[mode], True)
+            self._fields["seedRatioMode"] = Field(RATIO_LIMIT[mode], True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    seed_ratio_mode = property(_get_seed_ratio_mode, _set_seed_ratio_mode, None,
-                               """
+    seed_ratio_mode = property(
+        _get_seed_ratio_mode,
+        _set_seed_ratio_mode,
+        None,
+        """
         Seed ratio mode as string. Can be one of 'global', 'single' or 'unlimited'.
 
          * global, use session seed ratio limit.
@@ -408,16 +443,16 @@ class Torrent:
          * unlimited, no seed ratio limit.
 
         This is a mutator.
-        """
-                               )
+        """,
+    )
 
     def _get_upload_limit(self):
         """
         Get the upload limit.
         Can be a number or None.
         """
-        if self._fields['uploadLimited'].value:
-            return self._fields['uploadLimit'].value
+        if self._fields["uploadLimited"].value:
+            return self._fields["uploadLimit"].value
         else:
             return None
 
@@ -427,22 +462,26 @@ class Torrent:
         Can be a number, 'session' or None.
         """
         if isinstance(limit, int):
-            self._fields['uploadLimited'] = Field(True, True)
-            self._fields['uploadLimit'] = Field(limit, True)
+            self._fields["uploadLimited"] = Field(True, True)
+            self._fields["uploadLimit"] = Field(limit, True)
             self._push()
         elif limit is None:
-            self._fields['uploadLimited'] = Field(False, True)
+            self._fields["uploadLimited"] = Field(False, True)
             self._push()
         else:
             raise ValueError("Not a valid limit")
 
-    upload_limit = property(_get_upload_limit, _set_upload_limit,
-                            None, "Upload limit in Kbps or None. This is a mutator.")
+    upload_limit = property(
+        _get_upload_limit,
+        _set_upload_limit,
+        None,
+        "Upload limit in Kbps or None. This is a mutator.",
+    )
 
     def _get_queue_position(self):
         """Get the queue position for this torrent."""
         if self._rpc_version() >= 14:
-            return self._fields['queuePosition'].value
+            return self._fields["queuePosition"].value
         else:
             return 0
 
@@ -450,7 +489,7 @@ class Torrent:
         """Set the queue position for this torrent."""
         if self._rpc_version() >= 14:
             if isinstance(position, int):
-                self._fields['queuePosition'] = Field(position, True)
+                self._fields["queuePosition"] = Field(position, True)
                 self._push()
             else:
                 raise ValueError("Not a valid position")
@@ -458,7 +497,8 @@ class Torrent:
             pass
 
     queue_position = property(
-        _get_queue_position, _set_queue_position, None, "Queue position")
+        _get_queue_position, _set_queue_position, None, "Queue position"
+    )
 
     def update(self, timeout=None):
         """Update the torrent information."""
@@ -471,8 +511,7 @@ class Torrent:
         Start the torrent.
         """
         self._incoming_pending = True
-        self._client.start_torrent(
-            self.id, bypass_queue=bypass_queue, timeout=timeout)
+        self._client.start_torrent(self.id, bypass_queue=bypass_queue, timeout=timeout)
 
     def stop(self, timeout=None):
         """Stop the torrent."""

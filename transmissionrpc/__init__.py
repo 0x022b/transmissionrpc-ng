@@ -2,6 +2,7 @@
 # Copyright (c) 2008-2014 Erik Svensson <erik.public@gmail.com>
 # Copyright (c) 2019 Janne K <0x022b@gmail.com>
 # Licensed under the MIT license.
+# flake8: noqa
 
 from transmissionrpc.constants import (
     DEFAULT_PORT,
@@ -9,13 +10,13 @@ from transmissionrpc.constants import (
     PRIORITY,
     RATIO_LIMIT,
     LOGGER,
-)  # noqa: F401
-from transmissionrpc.error import TransmissionError, HTTPHandlerError  # noqa: F401
-from transmissionrpc.httphandler import HTTPHandler, DefaultHTTPHandler  # noqa: F401
-from transmissionrpc.torrent import Torrent  # noqa: F401
-from transmissionrpc.session import Session  # noqa: F401
-from transmissionrpc.client import Client  # noqa: F401
-from transmissionrpc.utils import add_stdout_logger, add_file_logger  # noqa: F401
+)
+from transmissionrpc.error import TransmissionError, HTTPHandlerError
+from transmissionrpc.httphandler import HTTPHandler, DefaultHTTPHandler
+from transmissionrpc.torrent import Torrent
+from transmissionrpc.session import Session
+from transmissionrpc.client import Client
+from transmissionrpc.utils import add_stdout_logger, add_file_logger
 
 __author__ = "Janne K <0x022b@gmail.com>"
 __version_major__ = 0

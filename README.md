@@ -38,6 +38,7 @@ NOTE: You might need administrator privileges to install Python modules.
 ## Running unit tests
 
 ```shell
+pipenv install
 pipenv run python3 -m unittest test/*.py
 ```
 
@@ -51,8 +52,8 @@ This project is licensed under the MIT License.
 
 ## Developers
 
-Copyright (c) 2008-2014 [Erik Svensson][blueluna]\
-Copyright (c) 2019 [Janne K][0x022b]
+Copyright &copy; 2008-2014 [Erik Svensson][blueluna]\
+Copyright &copy; 2019 [Janne K][0x022b]
 
 [0x022b]: https://github.com/0x022b
 [blueluna]: https://www.bitbucket.org/blueluna

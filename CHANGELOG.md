@@ -3,20 +3,26 @@
 This project is using [Semantic Versioning 2.0.0][semver] starting from release
 0.12.0.
 
+## transmissionrpc-ng 0.14.1
+
+- Reformat code with Black code style [GH-12]
+- Follow redirects to magnet links [GH-13]
+- Fix 'DefaultHTTPHandler' object has no attribute '_authorization' [GH-15]
+
 ## transmissionrpc-ng 0.14.0
 
-- Replace urllib.request with PycURL
+- Replace urllib.request with PycURL [GH-5]
 - Minor tweaks and fixes
 
 ## transmissionrpc-ng 0.13.1
 
-- Fix package metadata
+- Fix package metadata [GH-10]
 - Prettify documentation
 
 ## transmissionrpc-ng 0.13.0
 
-- Remove non-printable characters from RPC responses
-- Added support for gzip encoded torrents
+- Remove non-printable characters from RPC responses [GH-2]
+- Added support for gzip encoded torrents [GH-3]
 
 ## transmissionrpc-ng 0.12.0
 
@@ -24,7 +30,7 @@ This project is using [Semantic Versioning 2.0.0][semver] starting from release
 - Started using semantic versioning
 - Fixed lots of static code analysis issues
 - Removed deprecated methods
-- Dropped support for Python 2
+- Dropped support for Python 2 [GH-6]
 
 ## transmissionrpc 0.11
 
